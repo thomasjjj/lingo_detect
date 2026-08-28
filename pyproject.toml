@@ -1,0 +1,16 @@
+[project]
+name = "lingo-detect"
+version = "0.1.0"
+description = "Script-first language detection with uncertainty fallbacks"
+requires-python = ">=3.12"
+dependencies = []
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.package-data]
+lingo_detect = ["profiles.json"]
+
+[tool.setuptools]
+packages = ["lingo_detect"]

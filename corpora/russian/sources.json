@@ -1,0 +1,20 @@
+{
+  "language": "russian",
+  "language_code": "ru",
+  "retrieved_at": "2026-08-28T11:38:29+00:00",
+  "source": "Universal Declaration of Human Rights",
+  "source_repository": "https://github.com/wooorm/udhr",
+  "source_commit": "d3d38276c91668df9ac4e33e5dac7cd3a14c12b2",
+  "upstream_source": "Office of the UN High Commissioner for Human Rights",
+  "license": "The source package is MIT licensed and describes the UDHR as copyright-free",
+  "modified": "Extracted HTML paragraph text and truncated to 1,000 whitespace tokens",
+  "samples": [
+    {
+      "sample_file": "sample.txt",
+      "sample_word_count": 1000,
+      "source_file": "rus.html",
+      "source_word_count": 1523,
+      "url": "https://raw.githubusercontent.com/wooorm/udhr/d3d38276c91668df9ac4e33e5dac7cd3a14c12b2/declaration/rus.html"
+    }
+  ]
+}
