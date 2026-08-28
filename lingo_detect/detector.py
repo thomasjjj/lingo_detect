@@ -11,6 +11,10 @@ from importlib.resources import files
 
 
 WORD_PATTERN = re.compile(r"[^\W\d_]+(?:'[^\W\d_]+)*", re.UNICODE)
+CLAUSE_BOUNDARY_PATTERN = re.compile(
+    r"(?:\r\n|\r|\n|[.!?;:]+)[\t \f\v]*",
+    re.UNICODE,
+)
 APOSTROPHES = str.maketrans({"‘": "'", "’": "'", "ʻ": "'", "ʼ": "'", "`": "'"})
 SCRIPT_NAMES = {"Arab": "Arabic", "Cyrl": "Cyrillic", "Latn": "Latin"}
 LANGUAGE_NAMES = {
@@ -134,6 +138,94 @@ class DetectionResult:
         result["resolution"] = self.resolution
         result["label"] = self.label
         return result
+
+
+@dataclass(frozen=True, slots=True)
+class DetectionSegment:
+    """A contiguous text span and its independent detection result."""
+
+    start: int
+    end: int
+    text: str
+    detection: DetectionResult
+
+    @property
+    def script(self) -> str | None:
+        return self.detection.script
+
+    @property
+    def language_code(self) -> str | None:
+        return self.detection.language_code
+
+    @property
+    def confidence(self) -> float:
+        return self.detection.confidence
+
+    @property
+    def resolution(self) -> str:
+        return self.detection.resolution
+
+    @property
+    def label(self) -> str:
+        return self.detection.label
+
+    def as_dict(self) -> dict:
+        return {
+            "start": self.start,
+            "end": self.end,
+            "text": self.text,
+            **self.detection.as_dict(),
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class MixedDetectionResult:
+    """Whole-text detection plus ordered language/script-aware spans."""
+
+    primary: DetectionResult
+    segments: tuple[DetectionSegment, ...]
+
+    @staticmethod
+    def _ordered_unique(values: tuple[str | None, ...]) -> tuple[str, ...]:
+        return tuple(dict.fromkeys(value for value in values if value is not None))
+
+    @property
+    def scripts(self) -> tuple[str, ...]:
+        return self._ordered_unique(tuple(segment.script for segment in self.segments))
+
+    @property
+    def language_codes(self) -> tuple[str, ...]:
+        return self._ordered_unique(
+            tuple(segment.language_code for segment in self.segments)
+        )
+
+    @property
+    def is_mixed_script(self) -> bool:
+        return len(self.scripts) > 1
+
+    @property
+    def is_mixed_language(self) -> bool:
+        return len(self.language_codes) > 1
+
+    @property
+    def is_mixed(self) -> bool:
+        return self.is_mixed_script or self.is_mixed_language
+
+    @property
+    def has_unresolved_segments(self) -> bool:
+        return any(segment.language_code is None for segment in self.segments)
+
+    def as_dict(self) -> dict:
+        return {
+            "primary": self.primary.as_dict(),
+            "segments": tuple(segment.as_dict() for segment in self.segments),
+            "scripts": self.scripts,
+            "language_codes": self.language_codes,
+            "is_mixed_script": self.is_mixed_script,
+            "is_mixed_language": self.is_mixed_language,
+            "is_mixed": self.is_mixed,
+            "has_unresolved_segments": self.has_unresolved_segments,
+        }
 
 
 def _script_of(character: str) -> str | None:
@@ -302,3 +394,106 @@ def detect(text: str) -> DetectionResult:
         round(confidence, 6),
         tuple(alternatives),
     )
+
+
+def _mixed_boundaries(text: str) -> list[int]:
+    boundaries = {0, len(text)}
+    boundaries.update(match.end() for match in CLAUSE_BOUNDARY_PATTERN.finditer(text))
+
+    previous_script: str | None = None
+    for index, character in enumerate(text):
+        if not character.isalpha():
+            continue
+        script = _script_of(character)
+        if script is None:
+            continue
+        if previous_script is not None and script != previous_script:
+            boundaries.add(index)
+        previous_script = script
+    return sorted(boundaries)
+
+
+def _initial_segments(text: str) -> list[DetectionSegment]:
+    segments: list[DetectionSegment] = []
+    pending_prefix: int | None = None
+    boundaries = _mixed_boundaries(text)
+    for start, end in zip(boundaries, boundaries[1:]):
+        if start == end:
+            continue
+        value = text[start:end]
+        detection = detect(value)
+        if detection.script is None:
+            if segments:
+                previous = segments[-1]
+                segments[-1] = DetectionSegment(
+                    previous.start,
+                    end,
+                    text[previous.start:end],
+                    previous.detection,
+                )
+            elif pending_prefix is None:
+                pending_prefix = start
+            continue
+
+        if pending_prefix is not None:
+            start = pending_prefix
+            value = text[start:end]
+            pending_prefix = None
+        segments.append(DetectionSegment(start, end, value, detection))
+
+    if not segments and text:
+        return [DetectionSegment(0, len(text), text, detect(text))]
+    return segments
+
+
+def _merge_equivalent_segments(
+    text: str, segments: list[DetectionSegment]
+) -> tuple[DetectionSegment, ...]:
+    if not segments:
+        return ()
+
+    merged: list[DetectionSegment] = []
+    group_start = segments[0].start
+    group_end = segments[0].end
+    group_signature = (segments[0].script, segments[0].language_code)
+    for segment in segments[1:]:
+        signature = (segment.script, segment.language_code)
+        if signature == group_signature:
+            group_end = segment.end
+            continue
+
+        combined_text = text[group_start:group_end]
+        merged.append(
+            DetectionSegment(
+                group_start,
+                group_end,
+                combined_text,
+                detect(combined_text),
+            )
+        )
+        group_start = segment.start
+        group_end = segment.end
+        group_signature = signature
+
+    combined_text = text[group_start:group_end]
+    merged.append(
+        DetectionSegment(
+            group_start,
+            group_end,
+            combined_text,
+            detect(combined_text),
+        )
+    )
+    return tuple(merged)
+
+
+def detect_mixed(text: str) -> MixedDetectionResult:
+    """Detect ordered script/language spans while retaining a whole-text result.
+
+    Script transitions always create a candidate boundary. Strong sentence or
+    clause punctuation creates candidates for language changes within one
+    script. Adjacent spans with the same resolved signature are merged again.
+    """
+    primary = detect(text)
+    segments = _merge_equivalent_segments(text, _initial_segments(text))
+    return MixedDetectionResult(primary, segments)

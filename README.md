@@ -18,6 +18,7 @@ classifier.
 - Script recognition before language scoring.
 - ISO 639-1 language codes and ISO 15924 script codes.
 - Ranked language alternatives for the detected script.
+- Ordered mixed-language and mixed-script spans with exact character offsets.
 - Conservative script-only fallbacks for ambiguous text.
 - Different confidence thresholds for very short and longer inputs.
 - Unicode normalization and support for common apostrophe variants.
@@ -64,7 +65,8 @@ python -m pip install -e .
 The package can also be imported directly while the repository root is the
 current working directory.
 
-The supported public interface is currently the Python API. The scripts under
+The supported public interface is currently the Python API: use `detect()` for
+one whole-text result or `detect_mixed()` for ordered spans. The scripts under
 `tools/` are development and evaluation utilities, not a general-purpose text
 classification CLI.
 
@@ -170,11 +172,68 @@ results = [detect(text).as_dict() for text in texts]
 
 There is no fixed input-length cutoff. Runtime and memory use grow with the
 amount of text because letters, tokens, and character n-grams are counted for
-the complete string.
+the complete string. `detect_mixed()` performs additional work for each proposed
+span, then merges equivalent adjacent results.
 
 The input must be a Python `str`; passing `bytes`, `None`, or another type raises
 `TypeError`. An empty string, whitespace, punctuation, or digits alone returns
 `resolution == "none"` rather than raising an exception.
+
+## Detecting mixed languages and scripts
+
+Use `detect_mixed()` when one string can contain embedded names, quotations, or
+sentences in another language or alphabet:
+
+```python
+from lingo_detect import detect_mixed
+
+text = (
+    "The museum is called Государственный Эрмитаж, "
+    "and it is located in Saint Petersburg."
+)
+result = detect_mixed(text)
+
+print(result.scripts)         # ('Latn', 'Cyrl')
+print(result.language_codes)  # ('en', 'ru')
+print(result.is_mixed_script)    # True
+print(result.is_mixed_language)  # True
+
+for segment in result.segments:
+    print(segment.start, segment.end, segment.label, repr(segment.text))
+```
+
+The three returned segments are English, Russian, and English. Their
+`start:end` offsets always select the original span, and concatenating every
+`segment.text` reconstructs the input exactly. Each `DetectionSegment` exposes
+`script`, `language_code`, `confidence`, `resolution`, and `label`, while its
+full single-span result remains available as `segment.detection`.
+
+`MixedDetectionResult` provides:
+
+| Field | Meaning |
+|---|---|
+| `primary` | The unchanged whole-text result that `detect(text)` would return |
+| `segments` | Ordered `DetectionSegment` objects covering the input |
+| `scripts` | Unique resolved scripts in first-seen order |
+| `language_codes` | Unique resolved language codes in first-seen order |
+| `is_mixed_script` | Whether more than one supported script was found |
+| `is_mixed_language` | Whether more than one language was resolved |
+| `is_mixed` | Whether either scripts or languages are mixed |
+| `has_unresolved_segments` | Whether any span only reached script or no resolution |
+
+Call `result.as_dict()` to serialize the overall result, summary fields, and
+every segment together.
+
+Short names remain conservative. For a Wikipedia-style phrase such as
+`Moscow (Russian: Москва)`, the embedded `Москва` span is reliably identified as
+Cyrillic, but may return `language_code=None` because the spelling alone is not
+unique to Russian. Its ranked alternatives still place `ru` first. Longer
+Russian names or phrases can resolve the language directly.
+
+Language changes within the same script are detected at clear sentence or
+clause boundaries. For example, an English sentence followed by
+`Oʻzbekiston respublikasi mustaqil davlat.` produces `('en', 'uz')` even though
+both spans use Latin script.
 
 ## Multiscript examples
 
@@ -228,11 +287,16 @@ language-specific statistical evidence.
    evidence determine whether to return a language. Short inputs require much
    stronger evidence; otherwise the detector returns the script alone.
 
-For mixed-script strings, the detector returns one result for the entire input;
-it is not a language segmenter. A Latin acronym inside otherwise Arabic or
-Cyrillic text normally does not hide the dominant native script. For heavily
-mixed text, inspect `script`, `confidence`, and `resolution` rather than assuming
-the result describes every span.
+`detect()` returns one result for the entire input. A Latin acronym inside
+otherwise Arabic or Cyrillic text normally does not hide the dominant native
+script. Use `detect_mixed()` when the individual spans matter.
+
+Mixed detection first proposes boundaries at changes between supported scripts
+and after strong sentence or clause punctuation. Every span is passed through
+the same conservative `detect()` pipeline described above. Adjacent spans that
+resolve to the same script and language are merged again, preventing ordinary
+single-language paragraphs from being fragmented merely because they contain
+several sentences.
 
 ## Corpora and generated profiles
 
@@ -324,8 +388,13 @@ languages, which is how multiple Latin Uyghur orthographies can share `ug`.
   boundary.
 - Very short words may only resolve to a script, especially when closely related
   languages share letters and vocabulary.
-- The detector returns one dominant result and does not segment mixed-language
-  or code-switched input.
+- `detect()` returns one dominant result; callers must opt into segmentation
+  with `detect_mixed()`.
+- Same-script language changes without a sentence or clause boundary may remain
+  one span. This is heuristic span detection, not token-level code-switch
+  tagging.
+- Short proper names can identify a script without containing enough evidence
+  to resolve a language safely; inspect the span's alternatives in that case.
 - Alternative scores and confidence values are not yet calibrated probabilities.
 - Accuracy can vary by topic, dialect, spelling convention, and source quality.
 
