@@ -17,6 +17,7 @@ class DetectorTests(unittest.TestCase):
         self.assertEqual(detect("ښ").language_code, "ps")
         self.assertEqual(detect("ٹ").language_code, "ur")
         self.assertEqual(detect("ڭ").language_code, "ug")
+        self.assertEqual(detect("ğ").language_code, "tr")
 
     def test_ambiguous_character_falls_back_to_script(self) -> None:
         cyrillic = detect("а")
@@ -32,6 +33,12 @@ class DetectorTests(unittest.TestCase):
         result = detect("این یک متن فارسی برای آزمایش تشخیص زبان است")
         self.assertEqual((result.script, result.language_code), ("Arab", "fa"))
         self.assertEqual(result.label, "Arabic · Persian (Farsi)")
+
+    def test_turkish_is_detected_with_dotted_capital_i(self) -> None:
+        result = detect("İnsan hakları herkes için önemlidir")
+        self.assertEqual((result.script, result.language_code), ("Latn", "tr"))
+        self.assertEqual(result.label, "Latin · Turkish")
+        self.assertEqual(detect("İLE").language_code, "tr")
 
     def test_uighur_alphabets_map_to_ug(self) -> None:
         samples = {

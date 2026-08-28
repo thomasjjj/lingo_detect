@@ -67,6 +67,7 @@ LANGUAGES = {
     },
     "ru": {"name": "Russian", "flores": "rus_Cyrl", "script": "Cyrl"},
     "tg": {"name": "Tajik", "flores": "tgk_Cyrl", "script": "Cyrl"},
+    "tr": {"name": "Turkish", "flores": "tur_Latn", "script": "Latn"},
     "uk": {"name": "Ukrainian", "flores": "ukr_Cyrl", "script": "Cyrl"},
     "ur": {"name": "Urdu", "flores": "urd_Arab", "script": "Arab"},
     "ug": {

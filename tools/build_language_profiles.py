@@ -22,6 +22,7 @@ SOURCES = {
     "ps-Arab": ("ps", "Arab", ROOT / "corpora" / "pashto" / "sample.txt"),
     "ru-Cyrl": ("ru", "Cyrl", ROOT / "corpora" / "russian" / "sample.txt"),
     "tg-Cyrl": ("tg", "Cyrl", ROOT / "corpora" / "tajik" / "sample.txt"),
+    "tr-Latn": ("tr", "Latn", ROOT / "corpora" / "turkish" / "sample.txt"),
     "uk-Cyrl": ("uk", "Cyrl", ROOT / "corpora" / "ukrainian" / "sample.txt"),
     "ur-Arab": ("ur", "Arab", ROOT / "corpora" / "urdu" / "sample.txt"),
     "ug-Arab": ("ug", "Arab", ROOT / "corpora" / "uyghur" / "sample.txt"),
@@ -38,7 +39,12 @@ SOURCES = {
 
 
 def ngrams(text: str) -> Counter[str]:
-    normalised = unicodedata.normalize("NFKC", text).casefold().translate(APOSTROPHES)
+    normalised = (
+        unicodedata.normalize("NFKC", text)
+        .casefold()
+        .replace("i\u0307", "i")
+        .translate(APOSTROPHES)
+    )
     words = WORD_PATTERN.findall(normalised)
     counts: Counter[str] = Counter()
     for word in words:

@@ -24,6 +24,7 @@ LANGUAGE_NAMES = {
     "ps": "Pashto",
     "ru": "Russian",
     "tg": "Tajik",
+    "tr": "Turkish",
     "uk": "Ukrainian",
     "ur": "Urdu",
     "ug": "Uyghur",
@@ -54,6 +55,10 @@ CUE_WORDS = {
     "tg": {
         "ва", "дар", "ба", "ки", "ҳар", "як", "ё", "бо", "дорад", "аз",
         "инсон", "ҳақ", "ин", "шавад", "онҳо", "нест", "барои",
+    },
+    "tr": {
+        "ve", "için", "ile", "olarak", "olan", "olduğu", "hak", "veya", "de",
+        "da", "kendi", "hiç", "karşı", "daha", "çok", "tarafından",
     },
     "uk": {
         "і", "й", "та", "в", "у", "на", "не", "або", "що", "це", "як", "до",
@@ -94,6 +99,7 @@ DISTINCTIVE_CHARACTERS = {
     "ru": {"ы": 3.0, "щ": 0.5, "ъ": 0.3},
     "tg": {character: 3.0 for character in "ӣҷӯ"}
     | {character: 0.7 for character in "ғқҳ"},
+    "tr": {character: 3.2 for character in "ğşıç"},
     "uk": {character: 3.2 for character in "іїєґ"},
     "ur": {character: 3.0 for character in "ٹڈڑںھہے"}
     | {character: 0.4 for character in "پچژگ"},
@@ -246,7 +252,9 @@ def _script_of(character: str) -> str | None:
 
 
 def _normalise(text: str) -> str:
-    return unicodedata.normalize("NFKC", text).casefold()
+    # Unicode case-folding represents Turkish capital dotted İ as i + U+0307.
+    # Collapse that sequence so the combining dot does not split the word.
+    return unicodedata.normalize("NFKC", text).casefold().replace("i\u0307", "i")
 
 
 def _tokens(text: str) -> list[str]:

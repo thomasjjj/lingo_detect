@@ -7,6 +7,7 @@ input; both map to `uz`.
 
 The Persian directory uses the Western Farsi (`pes_1`) UDHR source, rather than
 the separate Dari (`pes_2`) source in the upstream package, and maps to `fa`.
+The Turkish directory contains modern Latin-script Turkish and maps to `tr`.
 
 Uyghur contains four 1,000-token samples, all mapping to `ug`:
 

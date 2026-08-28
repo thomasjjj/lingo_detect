@@ -24,6 +24,7 @@ classifier.
 - Unicode normalization and support for common apostrophe variants.
 - Multiple orthographies for Uyghur and Uzbek.
 - Western Persian/Farsi coverage using ISO 639-1 `fa`.
+- Modern Latin-script Turkish coverage using ISO 639-1 `tr`.
 - No runtime dependencies or external services.
 - Packaged language profiles, so detection works offline.
 
@@ -37,6 +38,7 @@ classifier.
 | Pashto | `ps` | Arabic (`Arab`), including Northern and Southern evaluation coverage |
 | Russian | `ru` | Cyrillic (`Cyrl`) |
 | Tajik | `tg` | Cyrillic (`Cyrl`) |
+| Turkish | `tr` | Latin (`Latn`), modern Turkish alphabet |
 | Ukrainian | `uk` | Cyrillic (`Cyrl`) |
 | Urdu | `ur` | Arabic (`Arab`) |
 | Uyghur | `ug` | Uyghur Arabic/UEY (`Arab`), Cyrillic/UKY (`Cyrl`), Latin/ULY (`Latn`), and legacy New Script/UYY (`Latn`) |
@@ -273,8 +275,8 @@ language-specific statistical evidence.
    dominant script are considered. This prevents, for example, English from
    competing with Tajik for Cyrillic input.
 4. **Score distinctive letters.** Orthography-specific characters carry strong
-   evidence. Examples include Ukrainian `ї`, Pashto `ښ`, Urdu `ٹ`, Uyghur `ڭ`
-   and `ү`, and Uzbek `ў`.
+   evidence. Examples include Ukrainian `ї`, Pashto `ښ`, Urdu `ٹ`, Turkish `ı`
+   and `ğ`, Uyghur `ڭ` and `ү`, and Uzbek `ў`.
 5. **Score cue words.** Frequent function words and language-specific lexical
    cues contribute additional evidence when individual letters are shared.
 6. **Compare character n-grams.** Word-boundary-aware character sequences of
@@ -330,7 +332,7 @@ network access. Rebuilding profiles from existing local samples does not.
 
 ## Evaluation
 
-The held-out suite contains 600 cases covering every supported language at 1,
+The held-out suite contains 640 cases covering every supported language at 1,
 2, 3, 5, 10, 20, 50, and 100 words. It separately counts exact-language
 answers, correct script-only fallbacks, and wrong answers.
 
@@ -338,12 +340,12 @@ Current results for the bundled detector are:
 
 | Outcome | Cases | Rate |
 |---|---:|---:|
-| Exact language | 465/600 | 77.5% |
-| Correct script-only fallback | 135/600 | 22.5% |
-| Useful language or script resolution | 600/600 | 100.0% |
-| Wrong | 0/600 | 0.0% |
+| Exact language | 488/640 | 76.2% |
+| Correct script-only fallback | 152/640 | 23.8% |
+| Useful language or script resolution | 640/640 | 100.0% |
+| Wrong | 0/640 | 0.0% |
 
-All cases of 20, 50, and 100 words resolve to the exact language in this suite.
+All 20-, 50-, and 100-word cases resolve to the exact language in this suite.
 Short ambiguous text deliberately accounts for most script-only results.
 
 Run the tests and evaluator with:

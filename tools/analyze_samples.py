@@ -90,7 +90,7 @@ def main() -> None:
     diagnostic_characters = {
         "Arabic-script": "ةأإآؤئءىكکيیۀپچژگٹڈڑںھہےټځڅډړږښګڼېۍەڭۆۇۈۋ",
         "Cyrillic-script": "ёыэъщцґєіїғӣқӯҳҷўәҗңөүһ",
-        "Latin-script": "qwxʻʼëéöüəƣɵⱨⱪⱬ",
+        "Latin-script": "qwxʻʼëéöüçğışəƣɵⱨⱪⱬ",
     }
     print("\n[diagnostic-character-counts]")
     for group, characters in diagnostic_characters.items():

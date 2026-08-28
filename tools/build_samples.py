@@ -40,6 +40,7 @@ LANGUAGES = {
     "pashto": {"code": "ps", "files": {"sample.txt": "pbu.html"}},
     "russian": {"code": "ru", "files": {"sample.txt": "rus.html"}},
     "tajik": {"code": "tg", "files": {"sample.txt": "tgk.html"}},
+    "turkish": {"code": "tr", "files": {"sample.txt": "tur.html"}},
     "ukrainian": {"code": "uk", "files": {"sample.txt": "ukr.html"}},
     "urdu": {"code": "ur", "files": {"sample.txt": "urd.html"}},
     "uyghur": {

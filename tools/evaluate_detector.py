@@ -31,6 +31,7 @@ LANGUAGE_SCRIPTS = {
     "ps": "Arab",
     "ru": "Cyrl",
     "tg": "Cyrl",
+    "tr": "Latn",
     "uk": "Cyrl",
     "ur": "Arab",
     # Uyghur and Uzbek are deliberately omitted because multiple scripts are
