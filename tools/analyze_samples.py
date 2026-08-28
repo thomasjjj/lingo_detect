@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import sys
 import unicodedata
 from collections import Counter
 from pathlib import Path
@@ -17,8 +18,14 @@ def script_of(character: str) -> str:
     name = unicodedata.name(character, "")
     if "ARABIC" in name:
         return "Arabic"
+    if "ARMENIAN" in name:
+        return "Armenian"
     if "CYRILLIC" in name:
         return "Cyrillic"
+    if "GEORGIAN" in name:
+        return "Georgian"
+    if "HEBREW" in name:
+        return "Hebrew"
     if "LATIN" in name:
         return "Latin"
     return "Other"
@@ -30,7 +37,13 @@ def label(path: Path) -> str:
         "sample_latn": "/latn",
         "sample_yengi": "/yengi",
     }
-    suffix = suffixes.get(path.stem, "")
+    suffix = suffixes.get(path.stem)
+    if suffix is None:
+        suffix = (
+            f"/{path.stem.removeprefix('sample_')}"
+            if path.stem.startswith("sample_")
+            else ""
+        )
     return f"{path.parent.name}{suffix}"
 
 
@@ -39,6 +52,9 @@ def format_counts(counts: Counter[str], limit: int) -> str:
 
 
 def main() -> None:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+
     paths = sorted(CORPORA.glob("*/sample*.txt"))
     texts = {
         label(path): unicodedata.normalize("NFC", path.read_text(encoding="utf-8")).casefold()
@@ -89,6 +105,7 @@ def main() -> None:
 
     diagnostic_characters = {
         "Arabic-script": "ةأإآؤئءىكکيیۀپچژگٹڈڑںھہےټځڅډړږښګڼېۍەڭۆۇۈۋ",
+        "Hebrew-script": "ךםןףץװױײ",
         "Cyrillic-script": "ёыэъщцґєіїғӣқӯҳҷўәҗңөүһ",
         "Latin-script": "qwxʻʼëéöüçğışəƣɵⱨⱪⱬ",
     }

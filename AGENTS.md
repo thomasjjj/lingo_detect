@@ -52,6 +52,7 @@ Use this section to record confirmed commands as the project matures.
 - Test: `python -m unittest discover -s .\tests -v`
 - Evaluate: `python .\tools\evaluate_detector.py`
 - Generate corpora: `python .\tools\build_samples.py`
+- Generate FLORES corpora: `python .\tools\build_flores_samples.py`
 - Generate profiles: `python .\tools\build_language_profiles.py`
 - Generate evaluation data: `python .\tools\build_test_samples.py`
 - Build: `py -3.12 -m build`

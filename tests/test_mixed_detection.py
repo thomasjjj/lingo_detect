@@ -9,7 +9,7 @@ from lingo_detect import DetectionSegment, MixedDetectionResult, detect, detect_
 class MixedDetectionTests(unittest.TestCase):
     def test_english_around_russian_span(self) -> None:
         text = (
-            "The museum is called Государственный Эрмитаж, "
+            "The museum is called Государственный Эрмитаж расположен в Санкт-Петербурге, "
             "and it is located in Saint Petersburg."
         )
         result = detect_mixed(text)

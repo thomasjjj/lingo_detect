@@ -35,12 +35,33 @@ USER_AGENT = "lingo-detect-corpus-builder/0.1 (educational language research)"
 # to the same ISO 639-1 language code even though their script signals differ.
 LANGUAGES = {
     "arabic": {"code": "ar", "files": {"sample.txt": "arb.html"}},
+    "armenian": {"code": "hy", "files": {"sample.txt": "hye.html"}},
+    "azerbaijani": {
+        "code": "az",
+        "files": {
+            "sample.txt": "azj_latn.html",
+            "sample_cyrl.txt": "azj_cyrl.html",
+        },
+    },
     "english": {"code": "en", "files": {"sample.txt": "eng.html"}},
+    "georgian": {"code": "ka", "files": {"sample.txt": "kat.html"}},
+    "hebrew": {"code": "he", "files": {"sample.txt": "heb.html"}},
+    "kazakh": {"code": "kk", "files": {"sample.txt": "kaz.html"}},
+    "kurdish": {"code": "ku", "files": {"sample_latn.txt": "kmr.html"}},
+    "kyrgyz": {"code": "ky", "files": {"sample.txt": "kir.html"}},
     "persian": {"code": "fa", "files": {"sample.txt": "pes_1.html"}},
     "pashto": {"code": "ps", "files": {"sample.txt": "pbu.html"}},
+    "punjabi": {"code": "pa", "files": {"sample.txt": "pnb.html"}},
     "russian": {"code": "ru", "files": {"sample.txt": "rus.html"}},
     "tajik": {"code": "tg", "files": {"sample.txt": "tgk.html"}},
     "turkish": {"code": "tr", "files": {"sample.txt": "tur.html"}},
+    "turkmen": {
+        "code": "tk",
+        "files": {
+            "sample.txt": "tuk_latn.html",
+            "sample_cyrl.txt": "tuk_cyrl.html",
+        },
+    },
     "ukrainian": {"code": "uk", "files": {"sample.txt": "ukr.html"}},
     "urdu": {"code": "ur", "files": {"sample.txt": "urd.html"}},
     "uyghur": {
@@ -57,6 +78,7 @@ LANGUAGES = {
             "sample_cyrl.txt": "uzn_cyrl.html",
         },
     },
+    "yiddish": {"code": "yi", "files": {"sample.txt": "ydd.html"}},
 }
 
 

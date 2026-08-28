@@ -15,15 +15,19 @@ class DetectorTests(unittest.TestCase):
     def test_distinctive_letters_can_resolve_one_character(self) -> None:
         self.assertEqual(detect("ї").language_code, "uk")
         self.assertEqual(detect("ښ").language_code, "ps")
-        self.assertEqual(detect("ٹ").language_code, "ur")
         self.assertEqual(detect("ڭ").language_code, "ug")
-        self.assertEqual(detect("ğ").language_code, "tr")
 
     def test_ambiguous_character_falls_back_to_script(self) -> None:
         cyrillic = detect("а")
         arabic = detect("و")
         self.assertEqual((cyrillic.script, cyrillic.language_code), ("Cyrl", None))
         self.assertEqual((arabic.script, arabic.language_code), ("Arab", None))
+        turkic = detect("ğ")
+        self.assertEqual((turkic.script, turkic.language_code), ("Latn", None))
+        urdu_punjabi = detect("ٹ")
+        self.assertEqual(
+            (urdu_punjabi.script, urdu_punjabi.language_code), ("Arab", None)
+        )
 
     def test_both_uzbek_scripts_map_to_uz(self) -> None:
         self.assertEqual(detect("oʻzbekiston respublikasi").language_code, "uz")
@@ -40,11 +44,29 @@ class DetectorTests(unittest.TestCase):
         self.assertEqual(result.label, "Latin · Turkish")
         self.assertEqual(detect("İLE").language_code, "tr")
 
+    def test_regional_expansion_languages(self) -> None:
+        samples = {
+            "az": "Bəşər ailəsinin bütün üzvlərinin bərabər və ayrılmaz hüquqları vardır",
+            "he": "כל אדם זכאי לכל הזכויות והחירויות",
+            "hy": "Յուրաքանչյուր ոք ունի բոլոր իրավունքներն ու ազատությունները",
+            "ka": "ყოველ ადამიანს აქვს ყველა უფლება და თავისუფლება",
+            "kk": "Әр адам құқықтары мен бостандықтарына ие",
+            "ku": "هەموو مرۆڤێک مافی ژیان و ئازادی هەیە",
+            "ky": "Ар бир адам укуктарга жана эркиндиктерге ээ",
+            "pa": "ہر شخص نوں آزادی تے برابر حقوق دا حق اے",
+            "sd": "هر هڪ ماڻهو کي حق ۽ آزادي حاصل آهي",
+            "tk": "Her bir adam hukuklara we azatlyklara haklydyr",
+            "yi": "היות װי יעדער מענטש האָט אַ רעכט אױף פֿרײַהײט",
+        }
+        for language_code, text in samples.items():
+            with self.subTest(language_code=language_code):
+                self.assertEqual(detect(text).language_code, language_code)
+
     def test_uighur_alphabets_map_to_ug(self) -> None:
         samples = {
             "Arab": "ھەر بىر ئىنسان ئەركىن تۇغۇلىدۇ",
-            "Latn": "her bir insan erkin tughulidu",
-            "Cyrl": "һәр бир инсан әркин туғулиду",
+            "Latn": "hemme adem behrimen bolushqa hoquqluq herqandaq ademni",
+            "Cyrl": "һәммә адәм бәһримән болушқа һоқуқлуқ һәрқандақ адәмни",
             "Latn-UYY": "ⱨər bir insan ərkin tuƣulidu",
         }
         for alphabet, text in samples.items():

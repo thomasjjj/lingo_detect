@@ -19,8 +19,14 @@ UNKNOWN_LANGUAGE_CODES = {"", "und", "unknown", "uncertain"}
 SCRIPT_ALIASES = {
     "arab": "Arab",
     "arabic": "Arab",
+    "armn": "Armn",
+    "armenian": "Armn",
     "cyrl": "Cyrl",
     "cyrillic": "Cyrl",
+    "geor": "Geor",
+    "georgian": "Geor",
+    "hebr": "Hebr",
+    "hebrew": "Hebr",
     "latn": "Latn",
     "latin": "Latn",
 }
@@ -28,14 +34,22 @@ LANGUAGE_SCRIPTS = {
     "ar": "Arab",
     "en": "Latn",
     "fa": "Arab",
+    "he": "Hebr",
+    "hy": "Armn",
+    "ka": "Geor",
+    "kk": "Cyrl",
+    "ky": "Cyrl",
+    "pa": "Arab",
     "ps": "Arab",
     "ru": "Cyrl",
+    "sd": "Arab",
     "tg": "Cyrl",
     "tr": "Latn",
     "uk": "Cyrl",
     "ur": "Arab",
-    # Uyghur and Uzbek are deliberately omitted because multiple scripts are
-    # supported for each language.
+    "yi": "Hebr",
+    # Azerbaijani, Kurdish, Turkmen, Uyghur, and Uzbek are deliberately omitted
+    # because multiple scripts are supported for each language.
 }
 
 
@@ -249,6 +263,9 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+
     args = parse_args()
     try:
         detector = load_detector(args.detector)

@@ -10,7 +10,7 @@ The recommended Python result shape is:
 
 ```python
 {
-    "script": "Cyrl",          # ISO 15924 code: Arab, Cyrl, or Latn
+    "script": "Cyrl",          # Arab, Armn, Cyrl, Geor, Hebr, or Latn
     "language_code": "tg",    # ISO 639-1 code, or None when uncertain
     "confidence": 0.91,
     "alternatives": [

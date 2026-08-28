@@ -16,25 +16,50 @@ CLAUSE_BOUNDARY_PATTERN = re.compile(
     re.UNICODE,
 )
 APOSTROPHES = str.maketrans({"‘": "'", "’": "'", "ʻ": "'", "ʼ": "'", "`": "'"})
-SCRIPT_NAMES = {"Arab": "Arabic", "Cyrl": "Cyrillic", "Latn": "Latin"}
+SCRIPT_NAMES = {
+    "Arab": "Arabic",
+    "Armn": "Armenian",
+    "Cyrl": "Cyrillic",
+    "Geor": "Georgian",
+    "Hebr": "Hebrew",
+    "Latn": "Latin",
+}
 LANGUAGE_NAMES = {
     "ar": "Arabic",
+    "az": "Azerbaijani",
     "en": "English",
     "fa": "Persian (Farsi)",
+    "he": "Hebrew",
+    "hy": "Armenian",
+    "ka": "Georgian",
+    "kk": "Kazakh",
+    "ku": "Kurdish",
+    "ky": "Kyrgyz",
+    "pa": "Punjabi",
     "ps": "Pashto",
     "ru": "Russian",
+    "sd": "Sindhi",
     "tg": "Tajik",
+    "tk": "Turkmen",
     "tr": "Turkish",
     "uk": "Ukrainian",
     "ur": "Urdu",
     "ug": "Uyghur",
     "uz": "Uzbek",
+    "yi": "Yiddish",
 }
 
 CUE_WORDS = {
     "ar": {
         "في", "من", "أن", "على", "إلى", "أو", "لا", "هو", "هي", "هذا",
         "هذه", "الذي", "التي", "كل", "لكل", "كان", "بين", "دون",
+    },
+    "az": {
+        "və", "bir", "hər", "hüququ", "malikdir", "ya", "heç", "bu", "ilə",
+        "üçün", "öz", "olan", "deyil",
+        "вә", "бир", "һәр", "һүгугуна", "маликдир", "ја", "һеч", "бу", "илә",
+        "үчүн", "өз", "олан",
+        "و", "کی", "ایله", "اوچون", "بیر", "او", "بو", "وار", "سونرا", "گؤره",
     },
     "en": {
         "the", "of", "and", "to", "in", "or", "is", "are", "that", "this",
@@ -44,6 +69,35 @@ CUE_WORDS = {
         "از", "آن", "این", "است", "با", "برای", "به", "بود", "در", "را",
         "که", "و", "هر", "همه", "هیچ", "یک", "خود", "شود", "دارد", "نیز",
     },
+    "he": {
+        "של", "כל", "אדם", "או", "על", "את", "לא", "הוא", "היא", "זכאי",
+        "החוק", "עם", "אם", "זה",
+    },
+    "hy": {
+        "ու", "ոք", "իրավունք", "ունի", "եւ", "կամ", "է", "իր", "յուրաքանչյուր",
+        "այս", "ամեն", "ոչ", "չի", "են",
+    },
+    "ka": {
+        "და", "უფლება", "აქვს", "ადამიანს", "ყველა", "ყოველ", "ან", "უნდა",
+        "არ", "მისი", "თუ", "ამ",
+    },
+    "kk": {
+        "және", "адам", "әр", "мен", "немесе", "құқығы", "бар", "өз", "арқылы",
+        "тиіс", "тең", "осы", "ешкім",
+    },
+    "ku": {
+        "لە", "و", "بە", "کە", "بۆ", "ئەو", "سەر", "دا", "بوو", "نییە",
+        "û", "ku", "bi", "ji", "di", "li", "xwe", "hemû", "maf", "herkes",
+        "kirin", "heye",
+    },
+    "ky": {
+        "жана", "менен", "адам", "бир", "ар", "же", "укуктуу", "тийиш", "бардык",
+        "өз", "эмес", "ээ", "эч", "үчүн",
+    },
+    "pa": {
+        "تے", "اے", "دا", "دی", "دے", "وچ", "ہر", "شخص", "توں", "یا", "کسے",
+        "نوں", "کوئی", "اوہدے", "وی",
+    },
     "ps": {
         "د", "په", "او", "چې", "له", "څوک", "شي", "وي", "نه", "هغه", "سره",
         "يا", "لري", "هر", "کښې", "کې", "يو", "یو", "دي", "ده",
@@ -52,9 +106,19 @@ CUE_WORDS = {
         "и", "в", "во", "на", "не", "или", "что", "это", "как", "по", "из",
         "к", "с", "для", "он", "она", "имеет", "каждый", "человек", "никто",
     },
+    "sd": {
+        "جي", "هڪ", "کي", "جو", "کان", "آهي", "لاء", "سان", "تي", "ڪئي",
+        "ڪرڻ", "جيڪو", "ڪندي", "ٿي", "هو",
+    },
     "tg": {
         "ва", "дар", "ба", "ки", "ҳар", "як", "ё", "бо", "дорад", "аз",
         "инсон", "ҳақ", "ин", "шавад", "онҳо", "нест", "барои",
+    },
+    "tk": {
+        "we", "bir", "adam", "her", "öz", "haklydyr", "ýa", "hem", "bu", "hiç",
+        "deň", "üçin", "bilen",
+        "ве", "бир", "адам", "хер", "өз", "хаклыдыр", "я", "хем", "бу", "хич",
+        "дең", "үчин", "билен",
     },
     "tr": {
         "ve", "için", "ile", "olarak", "olan", "olduğu", "hak", "veya", "de",
@@ -85,33 +149,44 @@ CUE_WORDS = {
         "ва", "бир", "инсон", "ёки", "ҳар", "билан", "эгадир", "ўз", "мумкин",
         "барча", "бўлган", "ҳеч", "эмас", "ким", "учун", "бу", "ҳам",
     },
+    "yi": {
+        "און", "די", "דער", "אױף", "ניט", "זײ", "איז", "אין", "פֿון", "מיט",
+        "צו", "דאָס",
+    },
 }
 
 # Weights are deliberately asymmetric: letters confined to one supported
 # orthography carry more evidence than letters shared by related languages.
 DISTINCTIVE_CHARACTERS = {
-    "ar": {character: 2.3 for character in "ةأإؤئءى"} | {"آ": 1.5},
+    "ar": {"ة": 2.3} | {character: 0.4 for character in "أإ"} | {"آ": 0.3},
+    "az": {character: 3.2 for character in "јҹҝ"} | {"ə": 0.15},
     "en": {"w": 1.1},
-    "fa": {"ۀ": 3.0, "ک": 0.7, "ی": 0.45}
-    | {character: 0.3 for character in "پچژگ"},
+    "fa": {"ۀ": 3.0},
+    "he": {},
+    "hy": {},
+    "ka": {},
+    "kk": {"ұ": 3.2, "і": 0.5}
+    | {character: 0.35 for character in "қғәңөү"},
+    "ku": {character: 3.2 for character in "ێڕڵڤêîû"} | {"ۆ": 0.35},
+    "ky": {character: 0.35 for character in "ңөү"},
+    "pa": {},
     "ps": {character: 3.2 for character in "ټځڅډړږښګڼېۍ"}
     | {character: 0.5 for character in "پچژ"},
-    "ru": {"ы": 3.0, "щ": 0.5, "ъ": 0.3},
+    "ru": {"щ": 0.5, "ъ": 0.3},
+    "sd": {character: 3.2 for character in "ڪٽڊڻٿڏڳڙٻڀڌڇڃٺڄڍ"},
     "tg": {character: 3.0 for character in "ӣҷӯ"}
     | {character: 0.7 for character in "ғқҳ"},
-    "tr": {character: 3.2 for character in "ğşıç"},
-    "uk": {character: 3.2 for character in "іїєґ"},
-    "ur": {character: 3.0 for character in "ٹڈڑںھہے"}
-    | {character: 0.4 for character in "پچژگ"},
-    "ug": {character: 3.2 for character in "ەڭۆۇۈۋې"}
-    | {"ى": 1.0}
-    | {character: 3.5 for character in "әҗңөүһ"}
-    | {character: 4.0 for character in "əƣɵⱨⱪⱬ"}
-    | {character: 2.2 for character in "ëé"}
-    | {character: 0.45 for character in "ғқ"},
+    "tk": {character: 3.2 for character in "ýňäž"},
+    "tr": {},
+    "uk": {character: 3.2 for character in "їєґ"},
+    "ur": {},
+    "ug": {character: 3.2 for character in "ڭۇۈۋ"}
+    | {character: 4.0 for character in "ƣɵⱨⱪⱬ"}
+    | {character: 2.2 for character in "ëé"},
     "uz": {"ў": 6.0, "ʻ": 3.0, "ʼ": 3.0}
     | {character: 0.65 for character in "қғҳ"}
     | {"q": 0.45, "x": 0.35},
+    "yi": {character: 3.5 for character in "װױײ"},
 }
 
 
@@ -244,8 +319,14 @@ def _script_of(character: str) -> str | None:
     name = unicodedata.name(character, "")
     if "ARABIC" in name:
         return "Arab"
+    if "ARMENIAN" in name:
+        return "Armn"
     if "CYRILLIC" in name:
         return "Cyrl"
+    if "GEORGIAN" in name:
+        return "Geor"
+    if "HEBREW" in name:
+        return "Hebr"
     if "LATIN" in name:
         return "Latn"
     return None
@@ -330,9 +411,7 @@ def _language_is_resolved(
         ) or (cue_score >= 0.9 and top >= 0.70)
     if word_count <= 3:
         return top >= 0.66 and margin >= 0.20
-    if word_count <= 10:
-        return top >= 0.54 and margin >= 0.10
-    return top >= 0.45 and margin >= 0.05
+    return top >= 0.30 and margin >= 0.05
 
 
 def detect(text: str) -> DetectionResult:

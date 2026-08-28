@@ -39,9 +39,54 @@ TARGET_LENGTHS = (1, 2, 3, 5, 10, 20, 50, 100)
 CASES_PER_LENGTH = 5
 USER_AGENT = "lingo-detect-test-builder/0.1 (educational language research)"
 UDHR_COMMIT = "d3d38276c91668df9ac4e33e5dac7cd3a14c12b2"
-NORTHERN_PASHTO_URL = (
+UDHR_RAW_ROOT = (
     "https://raw.githubusercontent.com/wooorm/udhr/"
-    f"{UDHR_COMMIT}/declaration/pbu.html"
+    f"{UDHR_COMMIT}/declaration"
+)
+NORTHERN_PASHTO_URL = (
+    f"{UDHR_RAW_ROOT}/pbu.html"
+)
+REGIONAL_UDHR_SOURCES = (
+    {
+        "case_prefix": "az-cyrl",
+        "expected_language": "az",
+        "language_name": "Azerbaijani",
+        "script": "Cyrl",
+        "variety": "North",
+        "source_code": "azj_cyrl",
+        "source_url": f"{UDHR_RAW_ROOT}/azj_cyrl.html",
+        "cases_per_length": 2,
+    },
+    {
+        "case_prefix": "ku-kmr",
+        "expected_language": "ku",
+        "language_name": "Kurdish",
+        "script": "Latn",
+        "variety": "Northern (Kurmanji)",
+        "source_code": "kmr",
+        "source_url": f"{UDHR_RAW_ROOT}/kmr.html",
+        "cases_per_length": 3,
+    },
+    {
+        "case_prefix": "pa-pnb",
+        "expected_language": "pa",
+        "language_name": "Punjabi",
+        "script": "Arab",
+        "variety": "Western",
+        "source_code": "pnb",
+        "source_url": f"{UDHR_RAW_ROOT}/pnb.html",
+        "cases_per_length": 5,
+    },
+    {
+        "case_prefix": "tk-cyrl",
+        "expected_language": "tk",
+        "language_name": "Turkmen",
+        "script": "Cyrl",
+        "variety": None,
+        "source_code": "tuk_cyrl",
+        "source_url": f"{UDHR_RAW_ROOT}/tuk_cyrl.html",
+        "cases_per_length": 1,
+    },
 )
 TATOEBA_UZBEK_URL = (
     "https://downloads.tatoeba.org/exports/per_language/uzb/uzb_sentences.tsv.bz2"
@@ -51,7 +96,44 @@ TATOEBA_UZBEK_SHA256 = (
 )
 
 LANGUAGES = {
-    "ar": {"name": "Arabic", "flores": "arb_Arab", "script": "Arab"},
+    "ar": {
+        "name": "Arabic",
+        "flores": "arb_Arab",
+        "script": "Arab",
+        "variety": "Modern Standard",
+    },
+    "ar-acm": {
+        "code": "ar", "name": "Arabic", "flores": "acm_Arab",
+        "script": "Arab", "variety": "Mesopotamian",
+    },
+    "ar-acq": {
+        "code": "ar", "name": "Arabic", "flores": "acq_Arab",
+        "script": "Arab", "variety": "Ta’izzi-Adeni",
+    },
+    "ar-ajp": {
+        "code": "ar", "name": "Arabic", "flores": "ajp_Arab",
+        "script": "Arab", "variety": "South Levantine",
+    },
+    "ar-apc": {
+        "code": "ar", "name": "Arabic", "flores": "apc_Arab",
+        "script": "Arab", "variety": "North Levantine",
+    },
+    "ar-ars": {
+        "code": "ar", "name": "Arabic", "flores": "ars_Arab",
+        "script": "Arab", "variety": "Najdi",
+    },
+    "ar-arz": {
+        "code": "ar", "name": "Arabic", "flores": "arz_Arab",
+        "script": "Arab", "variety": "Egyptian",
+    },
+    "az-latn": {
+        "code": "az", "name": "Azerbaijani", "flores": "azj_Latn",
+        "script": "Latn", "variety": "North",
+    },
+    "az-arab": {
+        "code": "az", "name": "Azerbaijani", "flores": "azb_Arab",
+        "script": "Arab", "variety": "South",
+    },
     "en": {"name": "English", "flores": "eng_Latn", "script": "Latn"},
     "fa": {
         "name": "Persian (Farsi)",
@@ -59,6 +141,22 @@ LANGUAGES = {
         "script": "Arab",
         "variety": "Western",
     },
+    "fa-dari": {
+        "code": "fa",
+        "name": "Persian",
+        "flores": "prs_Arab",
+        "script": "Arab",
+        "variety": "Dari",
+    },
+    "he": {"name": "Hebrew", "flores": "heb_Hebr", "script": "Hebr"},
+    "hy": {"name": "Armenian", "flores": "hye_Armn", "script": "Armn"},
+    "ka": {"name": "Georgian", "flores": "kat_Geor", "script": "Geor"},
+    "kk": {"name": "Kazakh", "flores": "kaz_Cyrl", "script": "Cyrl"},
+    "ku": {
+        "name": "Kurdish", "flores": "ckb_Arab", "script": "Arab",
+        "variety": "Central (Sorani)",
+    },
+    "ky": {"name": "Kyrgyz", "flores": "kir_Cyrl", "script": "Cyrl"},
     "ps": {
         "name": "Pashto",
         "flores": "pbt_Arab",
@@ -66,7 +164,14 @@ LANGUAGES = {
         "variety": "Southern",
     },
     "ru": {"name": "Russian", "flores": "rus_Cyrl", "script": "Cyrl"},
+    "sd": {
+        "name": "Sindhi",
+        "flores": "snd_Arab",
+        "script": "Arab",
+        "filter_nonlexical_tokens": True,
+    },
     "tg": {"name": "Tajik", "flores": "tgk_Cyrl", "script": "Cyrl"},
+    "tk": {"name": "Turkmen", "flores": "tuk_Latn", "script": "Latn"},
     "tr": {"name": "Turkish", "flores": "tur_Latn", "script": "Latn"},
     "uk": {"name": "Ukrainian", "flores": "ukr_Cyrl", "script": "Cyrl"},
     "ur": {"name": "Urdu", "flores": "urd_Arab", "script": "Arab"},
@@ -81,6 +186,10 @@ LANGUAGES = {
         "flores": "uzn_Latn",
         "script": "Latn",
         "variety": "Northern",
+    },
+    "yi": {
+        "name": "Yiddish", "flores": "ydd_Hebr", "script": "Hebr",
+        "variety": "Eastern",
     },
 }
 
@@ -136,8 +245,10 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def read_language_lines(archive: tarfile.TarFile, flores_code: str) -> list[str]:
-    member_name = f"./flores200_dataset/devtest/{flores_code}.devtest"
+def read_language_lines(
+    archive: tarfile.TarFile, flores_code: str, split: str = "devtest"
+) -> list[str]:
+    member_name = f"./flores200_dataset/{split}/{flores_code}.{split}"
     member = archive.getmember(member_name)
     source = archive.extractfile(member)
     if source is None:
@@ -186,8 +297,18 @@ def choose_window(
 def build_cases(archive_path: Path) -> list[dict]:
     cases = []
     with tarfile.open(archive_path, mode="r:gz") as archive:
-        for language_code, language in LANGUAGES.items():
+        for case_prefix, language in LANGUAGES.items():
+            language_code = language.get("code", case_prefix)
             lines = read_language_lines(archive, language["flores"])
+            if language.get("filter_nonlexical_tokens"):
+                lines = [
+                    " ".join(
+                        word
+                        for word in line.split()
+                        if any(character.isalpha() for character in word)
+                    )
+                    for line in lines
+                ]
             used_starts: set[int] = set()
             used_texts: set[str] = set()
             for word_count in TARGET_LENGTHS:
@@ -200,7 +321,7 @@ def build_cases(archive_path: Path) -> list[dict]:
                     )
                     cases.append(
                         {
-                            "id": f"{language_code}-{word_count:03}w-{case_number:02}",
+                            "id": f"{case_prefix}-{word_count:03}w-{case_number:02}",
                             "expected_language": language_code,
                             "language_name": language["name"],
                             "script": language["script"],
@@ -303,6 +424,56 @@ def build_northern_pashto_cases(html: str) -> list[dict]:
     return sorted(selected, key=lambda case: case["id"])
 
 
+def build_regional_udhr_cases(html: str, specification: dict) -> list[dict]:
+    """Build non-overlapping held-out cases after a 1,000-token profile prefix."""
+    parser = ParagraphExtractor()
+    parser.feed(html)
+    held_out_words = " ".join(parser.paragraphs).split()[1_000:]
+    specifications = [
+        (word_count, case_number)
+        for word_count in TARGET_LENGTHS
+        for case_number in range(1, specification["cases_per_length"] + 1)
+    ]
+    rng = random.Random(
+        f"{RANDOM_SEED}:{specification['source_code']}:heldout"
+    )
+    rng.shuffle(specifications)
+    cursor = 0
+    selected = []
+    for word_count, case_number in specifications:
+        end = cursor + word_count
+        if end > len(held_out_words):
+            raise ValueError(
+                f"{specification['source_code']} held-out source is too short"
+            )
+        selected.append(
+            {
+                "id": (
+                    f"{specification['case_prefix']}-{word_count:03}w-"
+                    f"{case_number:02}"
+                ),
+                "expected_language": specification["expected_language"],
+                "language_name": specification["language_name"],
+                "script": specification["script"],
+                "alphabet": None,
+                "variety": specification["variety"],
+                "word_count": word_count,
+                "text": " ".join(held_out_words[cursor:end]),
+                "source": {
+                    "dataset": "UDHR",
+                    "split": "heldout_after_training_prefix",
+                    "language_code": specification["source_code"],
+                    "source_url": specification["source_url"],
+                    "source_commit": UDHR_COMMIT,
+                    "token_start": 1_001 + cursor,
+                    "token_end": 1_000 + end,
+                },
+            }
+        )
+        cursor = end
+    return sorted(selected, key=lambda case: case["id"])
+
+
 def build_cyrillic_uzbek_cases(compressed_data: bytes) -> list[dict]:
     actual_hash = hashlib.sha256(compressed_data).hexdigest()
     if actual_hash != TATOEBA_UZBEK_SHA256:
@@ -384,6 +555,12 @@ def main() -> None:
         cases.extend(build_transliterated_uighur_cases(cases))
         cases.extend(build_cyrillic_uzbek_cases(download_bytes(TATOEBA_UZBEK_URL)))
         cases.extend(build_northern_pashto_cases(download_text(NORTHERN_PASHTO_URL)))
+        for specification in REGIONAL_UDHR_SOURCES:
+            cases.extend(
+                build_regional_udhr_cases(
+                    download_text(specification["source_url"]), specification
+                )
+            )
 
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text(

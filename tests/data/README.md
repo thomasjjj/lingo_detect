@@ -1,18 +1,22 @@
 # Held-out language-identification cases
 
-`flores200_devtest.jsonl` contains five deterministic cases for every
-combination of these dimensions:
+`flores200_devtest.jsonl` contains deterministic cases for these dimensions:
 
-- language: `ar`, `en`, `fa`, `ps`, `ru`, `tg`, `tr`, `ug`, `uk`, `ur`, `uz`
+- language: `ar`, `az`, `en`, `fa`, `he`, `hy`, `ka`, `kk`, `ku`, `ky`, `pa`,
+  `ps`, `ru`, `sd`, `tg`, `tk`, `tr`, `ug`, `uk`, `ur`, `uz`, `yi`
 - whitespace-token length: 1, 2, 3, 5, 10, 20, 50, 100
 
-The core FLORES matrix produces 440 cases. Another 40 native Cyrillic Uzbek
-cases come from Tatoeba's Uzbek export. A further 40 Northern Pashto cases use
-the non-overlapping portion of the pinned UDHR text after the 1,000-token
-training prefix. Each of the 40 source Uyghur Arabic cases also has parallel
-Uyghur Latin, Cyrillic, and New Script forms, adding 120 cases. The complete
-suite therefore has 640 cases. Do not use this file to train or tune the
-detector; it is an evaluation set.
+The 29 FLORES language/variety configurations produce 1,160 cases. Another 40
+native Cyrillic Uzbek cases come from Tatoeba, 40 Northern Pashto cases come
+from held-out UDHR text, and the 40 Uyghur Arabic cases have three parallel
+alphabet conversions, adding 120. Disjoint UDHR suffixes add 16 Azerbaijani
+Cyrillic, 24 Kurmanji, 40 Western Punjabi, and 8 Turkmen Cyrillic cases. The
+complete suite therefore has 1,448 cases.
+
+The packaged n-gram profiles do not use these case texts. Detector weights and
+resolution thresholds have, however, been iteratively checked against this
+suite, so it is a development benchmark rather than an untouched final test.
+Use an independent message-domain corpus to estimate operational accuracy.
 
 The source is the `devtest` split of FLORES-200, downloaded from
 `https://dl.fbaipublicfiles.com/nllb/flores200_dataset.tar.gz`. The archive is
@@ -27,6 +31,16 @@ build the detector profile.
 
 Turkish uses FLORES modern Latin-script Turkish (`tur_Latn`) and maps to `tr`.
 These cases are independent of the Turkish UDHR profile corpus.
+
+Regional FLORES coverage includes six colloquial Arabic varieties in addition
+to Modern Standard Arabic; North and South Azerbaijani; Dari; Central Kurdish;
+Hebrew; Armenian; Georgian; Kazakh; Kyrgyz; Sindhi; Turkmen; and Eastern
+Yiddish. The corresponding profiles use FLORES `dev` only where the pinned UDHR
+checkout lacks the required variety, while these cases use `devtest`.
+
+Disjoint post-prefix UDHR cases cover Azerbaijani Cyrillic, Kurmanji Latin,
+Western Punjabi/Shahmukhi, and Turkmen Cyrillic. Their per-case token ranges are
+recorded and do not overlap the 1,000-token profile prefix or one another.
 
 FLORES supplies Southern Pashto (`pbt_Arab`), while the additional held-out UDHR
 cases supply Northern Pashto (`pbu`); both map to the ISO 639-1 code `ps`.
@@ -43,10 +57,8 @@ regional vocabulary differences found in independently authored Central Asian
 Cyrillic Uyghur. Every converted case records the transformation in its source
 metadata.
 
-The additional Northern Pashto source is the copyright-free UDHR package pinned
-to commit `d3d38276c91668df9ac4e33e5dac7cd3a14c12b2`. Its test token ranges are
-recorded in every case and are disjoint from both the 1,000-token training prefix
-and one another.
+The UDHR sources are from the copyright-free package pinned to commit
+`d3d38276c91668df9ac4e33e5dac7cd3a14c12b2`.
 
 Regenerate the data with:
 

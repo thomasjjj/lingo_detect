@@ -9,9 +9,23 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CASES_PATH = ROOT / "tests" / "data" / "flores200_devtest.jsonl"
-LANGUAGES = {"ar", "en", "fa", "ps", "ru", "tg", "tr", "ug", "uk", "ur", "uz"}
+LANGUAGES = {
+    "ar", "az", "en", "fa", "he", "hy", "ka", "kk", "ku", "ky",
+    "pa", "ps", "ru", "sd", "tg", "tk", "tr", "ug", "uk", "ur",
+    "uz", "yi",
+}
 LENGTHS = {1, 2, 3, 5, 10, 20, 50, 100}
 CASES_PER_BUCKET = 5
+CASES_PER_LANGUAGE_BUCKET = {
+    "ar": 35,
+    "az": 12,
+    "fa": 10,
+    "ku": 8,
+    "ps": 10,
+    "tk": 6,
+    "ug": 20,
+    "uz": 10,
+}
 
 
 class EvaluationDataTests(unittest.TestCase):
@@ -27,8 +41,8 @@ class EvaluationDataTests(unittest.TestCase):
             (case["expected_language"], case["word_count"]) for case in self.cases
         )
         expected = Counter({
-            (language, length): (
-                CASES_PER_BUCKET * {"ps": 2, "ug": 4, "uz": 2}.get(language, 1)
+            (language, length): CASES_PER_LANGUAGE_BUCKET.get(
+                language, CASES_PER_BUCKET
             )
             for language in LANGUAGES
             for length in LENGTHS
@@ -87,7 +101,11 @@ class EvaluationDataTests(unittest.TestCase):
             if case["expected_language"] != "ug":
                 continue
             with self.subTest(case=case["id"]):
-                letters = [character for character in case["text"] if character.isalpha()]
+                letters = [
+                    character
+                    for character in case["text"]
+                    if character.isalpha()
+                ]
                 expected_name = {
                     "Arab": "ARABIC",
                     "Cyrl": "CYRILLIC",
@@ -125,6 +143,33 @@ class EvaluationDataTests(unittest.TestCase):
         self.assertGreaterEqual(ranges[0][0], 1_001)
         for previous, current in zip(ranges, ranges[1:]):
             self.assertLess(previous[1], current[0])
+
+    def test_regional_udhr_cases_do_not_overlap_training_or_each_other(self) -> None:
+        for prefix in {"az-cyrl-", "ku-kmr-", "pa-pnb-", "tk-cyrl-"}:
+            ranges = sorted(
+                (case["source"]["token_start"], case["source"]["token_end"])
+                for case in self.cases
+                if case["id"].startswith(prefix)
+            )
+            with self.subTest(prefix=prefix):
+                self.assertTrue(ranges)
+                self.assertGreaterEqual(ranges[0][0], 1_001)
+                for previous, current in zip(ranges, ranges[1:]):
+                    self.assertLess(previous[1], current[0])
+
+    def test_new_script_cases_use_the_declared_unicode_script(self) -> None:
+        script_names = {"Armn": "ARMENIAN", "Geor": "GEORGIAN", "Hebr": "HEBREW"}
+        for case in self.cases:
+            if case["script"] not in script_names:
+                continue
+            with self.subTest(case=case["id"]):
+                letters = [character for character in case["text"] if character.isalpha()]
+                matching = [
+                    character
+                    for character in letters
+                    if script_names[case["script"]] in unicodedata.name(character, "")
+                ]
+                self.assertGreater(len(matching) / len(letters), 0.90)
 
     def test_ids_and_texts_are_unique(self) -> None:
         ids = [case["id"] for case in self.cases]

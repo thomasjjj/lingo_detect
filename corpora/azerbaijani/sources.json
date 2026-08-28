@@ -1,0 +1,27 @@
+{
+  "language": "azerbaijani",
+  "language_code": "az",
+  "retrieved_at": "2026-08-28T15:54:24+00:00",
+  "source": "Universal Declaration of Human Rights",
+  "source_repository": "https://github.com/wooorm/udhr",
+  "source_commit": "d3d38276c91668df9ac4e33e5dac7cd3a14c12b2",
+  "upstream_source": "Office of the UN High Commissioner for Human Rights",
+  "license": "The source package is MIT licensed and describes the UDHR as copyright-free",
+  "modified": "Extracted HTML paragraph text and truncated to 1,000 whitespace tokens",
+  "samples": [
+    {
+      "sample_file": "sample.txt",
+      "sample_word_count": 1000,
+      "source_file": "azj_latn.html",
+      "source_word_count": 1425,
+      "url": "https://raw.githubusercontent.com/wooorm/udhr/d3d38276c91668df9ac4e33e5dac7cd3a14c12b2/declaration/azj_latn.html"
+    },
+    {
+      "sample_file": "sample_cyrl.txt",
+      "sample_word_count": 1000,
+      "source_file": "azj_cyrl.html",
+      "source_word_count": 1425,
+      "url": "https://raw.githubusercontent.com/wooorm/udhr/d3d38276c91668df9ac4e33e5dac7cd3a14c12b2/declaration/azj_cyrl.html"
+    }
+  ]
+}
