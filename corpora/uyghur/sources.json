@@ -1,0 +1,39 @@
+{
+  "language": "uyghur",
+  "language_code": "ug",
+  "retrieved_at": "2026-08-28T15:16:02+00:00",
+  "source": "Universal Declaration of Human Rights",
+  "source_repository": "https://github.com/wooorm/udhr",
+  "source_commit": "d3d38276c91668df9ac4e33e5dac7cd3a14c12b2",
+  "upstream_source": "Office of the UN High Commissioner for Human Rights",
+  "license": "The source package is MIT licensed and describes the UDHR as copyright-free",
+  "modified": "Extracted HTML paragraph text and truncated to 1,000 whitespace tokens; Uyghur Cyrillic and New Script samples were generated from the Arabic sample with deterministic alphabet mappings",
+  "samples": [
+    {
+      "sample_file": "sample.txt",
+      "sample_word_count": 1000,
+      "source_file": "uig_arab.html",
+      "source_word_count": 1456,
+      "url": "https://raw.githubusercontent.com/wooorm/udhr/d3d38276c91668df9ac4e33e5dac7cd3a14c12b2/declaration/uig_arab.html"
+    },
+    {
+      "sample_file": "sample_latn.txt",
+      "sample_word_count": 1000,
+      "source_file": "uig_latn.html",
+      "source_word_count": 1455,
+      "url": "https://raw.githubusercontent.com/wooorm/udhr/d3d38276c91668df9ac4e33e5dac7cd3a14c12b2/declaration/uig_latn.html"
+    },
+    {
+      "sample_file": "sample_cyrl.txt",
+      "sample_word_count": 1000,
+      "generated_from": "sample.txt",
+      "transformation": "Uyghur Arabic (UEY) to Uyghur Cyrillic (UKY)"
+    },
+    {
+      "sample_file": "sample_yengi.txt",
+      "sample_word_count": 1000,
+      "generated_from": "sample.txt",
+      "transformation": "Uyghur Arabic (UEY) to Uyghur New Script (UYY)"
+    }
+  ]
+}

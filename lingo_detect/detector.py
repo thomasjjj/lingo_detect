@@ -21,6 +21,7 @@ LANGUAGE_NAMES = {
     "tg": "Tajik",
     "uk": "Ukrainian",
     "ur": "Urdu",
+    "ug": "Uyghur",
     "uz": "Uzbek",
 }
 
@@ -53,9 +54,20 @@ CUE_WORDS = {
         "کے", "کی", "کا", "اور", "میں", "سے", "کو", "ہے", "ہیں", "اس", "یا",
         "پر", "ہر", "نہیں", "جائے", "ایک", "کہ", "جو", "کوئی",
     },
+    "ug": {
+        "ۋە", "بىر", "ھەر", "ئىنسان", "ياكى", "بىلەن", "ئۇ", "بۇ", "ئۈچۈن",
+        "بار", "ئەمەس", "ئۆز", "ھوقۇق", "قىلىش", "بولغان",
+        "we", "bir", "her", "insan", "yaki", "bilen", "u", "bu", "üchün",
+        "bar", "emes", "öz", "hoquq", "qilish", "bolghan",
+        "вә", "һәр", "инсан", "яки", "билән", "үчүн", "әмәс", "өз",
+        "һуқуқ", "қилиш", "болған",
+        "wə", "ⱨər", "bilən", "üqün", "əməs", "ɵz", "ⱨoⱪuⱪ", "ⱪilix",
+        "bolƣan",
+    },
     "uz": {
         "va", "bir", "inson", "yoki", "har", "bilan", "egadir", "o'z", "mumkin",
         "barcha", "bo'lgan", "hech", "emas", "kim", "uchun", "bu", "ham",
+        "o'zbekiston", "respublikasi",
         "ва", "бир", "инсон", "ёки", "ҳар", "билан", "эгадир", "ўз", "мумкин",
         "барча", "бўлган", "ҳеч", "эмас", "ким", "учун", "бу", "ҳам",
     },
@@ -75,6 +87,12 @@ DISTINCTIVE_CHARACTERS = {
     "ur": {character: 3.0 for character in "ٹڈڑںھہے"}
     | {"ی": 1.6}
     | {character: 0.4 for character in "پچژگ"},
+    "ug": {character: 3.2 for character in "ەڭۆۇۈۋې"}
+    | {"ى": 1.0}
+    | {character: 3.5 for character in "әҗңөүһ"}
+    | {character: 4.0 for character in "əƣɵⱨⱪⱬ"}
+    | {character: 2.2 for character in "ëé"}
+    | {character: 0.45 for character in "ғқ"},
     "uz": {"ў": 6.0, "ʻ": 3.0, "ʼ": 3.0}
     | {character: 0.65 for character in "қғҳ"}
     | {"q": 0.45, "x": 0.35},

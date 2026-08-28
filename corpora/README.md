@@ -5,6 +5,17 @@ Each language directory contains a 1,000-whitespace-token UTF-8 sample in
 1,000-token Cyrillic sample because both Latin and Cyrillic Uzbek occur in real
 input; both map to `uz`.
 
+Uyghur contains four 1,000-token samples, all mapping to `ug`:
+
+- `sample.txt`: source Uyghur Arabic (UEY)
+- `sample_latn.txt`: source Uyghur Latin (ULY)
+- `sample_cyrl.txt`: UEY converted to Uyghur Cyrillic (UKY)
+- `sample_yengi.txt`: UEY converted to the legacy Uyghur New Script (UYY)
+
+The generated samples retain their derivation in `sources.json`; the alphabet
+mapping implementation and exhaustive core-letter tests are in
+`tools/uyghur_transliteration.py` and `tests/test_uyghur_transliteration.py`.
+
 All samples are translations of the Universal Declaration of Human Rights from
 a pinned revision of the `wooorm/udhr` corpus. This alignment greatly reduces
 topic bias. They are intended for feature exploration and tests, not as a large

@@ -32,7 +32,8 @@ LANGUAGE_SCRIPTS = {
     "tg": "Cyrl",
     "uk": "Cyrl",
     "ur": "Arab",
-    # Uzbek is deliberately omitted because both Latn and Cyrl are supported.
+    # Uyghur and Uzbek are deliberately omitted because multiple scripts are
+    # supported for each language.
 }
 
 
@@ -193,6 +194,14 @@ def print_report(evaluation: dict) -> None:
             lambda row: (
                 f"{row['expected_language']}/{row['variety']}"
                 if row.get("variety")
+                else None
+            ),
+        ),
+        (
+            "language/alphabet",
+            lambda row: (
+                f"{row['expected_language']}/{row['alphabet']}"
+                if row.get("alphabet")
                 else None
             ),
         ),

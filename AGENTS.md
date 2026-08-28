@@ -49,21 +49,12 @@ Before making changes:
 
 Use this section to record confirmed commands as the project matures.
 
-- Setup/toolchain check: `.\gradlew.bat --version` (Gradle provisions the Java 25
-  toolchain when necessary)
-- Format: `.\gradlew.bat spotlessApply`
-- Lint: `.\gradlew.bat spotlessCheck checkstyleMain checkstyleTest`
-- Test: `.\gradlew.bat test runGameTestServer`
-- Targeted GameTest: `.\gradlew.bat runGameTestServer
-  --args="net.neoforged.fml.startup.GameTestServer --tests village_muster:<test_id>"`
-- v0.1 same-world acceptance restart: `.\gradlew.bat runV01AcceptanceHarness`
-- Process-level inventory restart test: `.\gradlew.bat runInventoryRestartHarness`
-- Data generation: `.\gradlew.bat runData`
-- Dedicated-server smoke: `.\gradlew.bat runServerSmoke`
-- Build: `.\gradlew.bat build`
-- Generate soldier textures: `.\gradlew.bat generateSoldierTextures`
-- Generate GameTest structures: `.\gradlew.bat generateGameTestStructures`
-- Run app locally: `.\gradlew.bat runClient`
+- Test: `python -m unittest discover -s .\tests -v`
+- Evaluate: `python .\tools\evaluate_detector.py`
+- Generate corpora: `python .\tools\build_samples.py`
+- Generate profiles: `python .\tools\build_language_profiles.py`
+- Generate evaluation data: `python .\tools\build_test_samples.py`
+- Build: `py -3.12 -m build`
 
 Guidelines:
 

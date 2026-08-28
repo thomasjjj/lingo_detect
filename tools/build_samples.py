@@ -16,6 +16,11 @@ from html.parser import HTMLParser
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 
+try:
+    from .uyghur_transliteration import arabic_to_cyrillic, arabic_to_new_script
+except ImportError:  # Support ``python tools/build_samples.py``.
+    from uyghur_transliteration import arabic_to_cyrillic, arabic_to_new_script
+
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPORA = ROOT / "corpora"
@@ -35,6 +40,13 @@ LANGUAGES = {
     "tajik": {"code": "tg", "files": {"sample.txt": "tgk.html"}},
     "ukrainian": {"code": "uk", "files": {"sample.txt": "ukr.html"}},
     "urdu": {"code": "ur", "files": {"sample.txt": "urd.html"}},
+    "uyghur": {
+        "code": "ug",
+        "files": {
+            "sample.txt": "uig_arab.html",
+            "sample_latn.txt": "uig_latn.html",
+        },
+    },
     "uzbek": {
         "code": "uz",
         "files": {
@@ -114,6 +126,29 @@ def main() -> None:
                 }
             )
 
+        if directory_name == "uyghur":
+            arabic_sample = (destination / "sample.txt").read_text(encoding="utf-8")
+            generated_samples = {
+                "sample_cyrl.txt": (
+                    arabic_to_cyrillic(arabic_sample),
+                    "Uyghur Arabic (UEY) to Uyghur Cyrillic (UKY)",
+                ),
+                "sample_yengi.txt": (
+                    arabic_to_new_script(arabic_sample),
+                    "Uyghur Arabic (UEY) to Uyghur New Script (UYY)",
+                ),
+            }
+            for output_name, (sample, transformation) in generated_samples.items():
+                (destination / output_name).write_text(sample, encoding="utf-8")
+                sources.append(
+                    {
+                        "sample_file": output_name,
+                        "sample_word_count": len(sample.split()),
+                        "generated_from": "sample.txt",
+                        "transformation": transformation,
+                    }
+                )
+
         metadata = {
             "language": directory_name,
             "language_code": language["code"],
@@ -123,7 +158,13 @@ def main() -> None:
             "source_commit": SOURCE_COMMIT,
             "upstream_source": "Office of the UN High Commissioner for Human Rights",
             "license": "The source package is MIT licensed and describes the UDHR as copyright-free",
-            "modified": "Extracted HTML paragraph text and truncated to 1,000 whitespace tokens",
+            "modified": (
+                "Extracted HTML paragraph text and truncated to 1,000 whitespace "
+                "tokens; Uyghur Cyrillic and New Script samples were generated "
+                "from the Arabic sample with deterministic alphabet mappings"
+                if directory_name == "uyghur"
+                else "Extracted HTML paragraph text and truncated to 1,000 whitespace tokens"
+            ),
             "samples": sources,
         }
         (destination / "sources.json").write_text(

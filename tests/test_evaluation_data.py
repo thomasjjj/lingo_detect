@@ -9,7 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CASES_PATH = ROOT / "tests" / "data" / "flores200_devtest.jsonl"
-LANGUAGES = {"ar", "en", "ps", "ru", "tg", "uk", "ur", "uz"}
+LANGUAGES = {"ar", "en", "ps", "ru", "tg", "ug", "uk", "ur", "uz"}
 LENGTHS = {1, 2, 3, 5, 10, 20, 50, 100}
 CASES_PER_BUCKET = 5
 
@@ -28,7 +28,7 @@ class EvaluationDataTests(unittest.TestCase):
         )
         expected = Counter({
             (language, length): (
-                CASES_PER_BUCKET * 2 if language in {"ps", "uz"} else CASES_PER_BUCKET
+                CASES_PER_BUCKET * {"ps": 2, "ug": 4, "uz": 2}.get(language, 1)
             )
             for language in LANGUAGES
             for length in LENGTHS
@@ -63,6 +63,43 @@ class EvaluationDataTests(unittest.TestCase):
         )
         self.assertEqual(uzbek_scripts, expected_scripts)
 
+    def test_all_supported_uighur_alphabets_are_covered(self) -> None:
+        uighur_alphabets = Counter(
+            (case["alphabet"], case["word_count"])
+            for case in self.cases
+            if case["expected_language"] == "ug"
+        )
+        expected = Counter(
+            {
+                (alphabet, length): CASES_PER_BUCKET
+                for alphabet in {
+                    "Uyghur Arabic (UEY)",
+                    "Uyghur Latin (ULY)",
+                    "Uyghur Cyrillic (UKY)",
+                    "Uyghur New Script (UYY)",
+                }
+                for length in LENGTHS
+            }
+        )
+        self.assertEqual(uighur_alphabets, expected)
+
+        for case in self.cases:
+            if case["expected_language"] != "ug":
+                continue
+            with self.subTest(case=case["id"]):
+                letters = [character for character in case["text"] if character.isalpha()]
+                expected_name = {
+                    "Arab": "ARABIC",
+                    "Cyrl": "CYRILLIC",
+                    "Latn": "LATIN",
+                }[case["script"]]
+                matching = [
+                    character
+                    for character in letters
+                    if expected_name in unicodedata.name(character, "")
+                ]
+                self.assertGreater(len(matching) / len(letters), 0.95)
+
     def test_cyrillic_uzbek_contains_cyrillic_letters(self) -> None:
         for case in self.cases:
             if case["expected_language"] == "uz" and case["script"] == "Cyrl":
@@ -95,6 +132,7 @@ class EvaluationDataTests(unittest.TestCase):
             (
                 case["expected_language"],
                 case["script"],
+                case.get("alphabet"),
                 case.get("variety"),
                 case["text"],
             )

@@ -23,6 +23,14 @@ SOURCES = {
     "tg-Cyrl": ("tg", "Cyrl", ROOT / "corpora" / "tajik" / "sample.txt"),
     "uk-Cyrl": ("uk", "Cyrl", ROOT / "corpora" / "ukrainian" / "sample.txt"),
     "ur-Arab": ("ur", "Arab", ROOT / "corpora" / "urdu" / "sample.txt"),
+    "ug-Arab": ("ug", "Arab", ROOT / "corpora" / "uyghur" / "sample.txt"),
+    "ug-Latn": ("ug", "Latn", ROOT / "corpora" / "uyghur" / "sample_latn.txt"),
+    "ug-Cyrl": ("ug", "Cyrl", ROOT / "corpora" / "uyghur" / "sample_cyrl.txt"),
+    "ug-Latn-UYY": (
+        "ug",
+        "Latn",
+        ROOT / "corpora" / "uyghur" / "sample_yengi.txt",
+    ),
     "uz-Latn": ("uz", "Latn", ROOT / "corpora" / "uzbek" / "sample.txt"),
     "uz-Cyrl": ("uz", "Cyrl", ROOT / "corpora" / "uzbek" / "sample_cyrl.txt"),
 }

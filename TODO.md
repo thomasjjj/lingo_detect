@@ -4,6 +4,7 @@
 - [x] Add script-only uncertainty fallbacks and ranked language alternatives.
 - [x] Cover Northern and Southern Pashto evaluation cases under `ps`.
 - [x] Add independent native Cyrillic Uzbek evaluation cases.
+- [x] Add modern Uyghur Arabic, Latin, Cyrillic, and legacy New Script support.
 - [x] Validate source-checkout execution and wheel packaging.
 - [ ] Calibrate reported confidence values on a larger multi-domain corpus.
 - [ ] Add mixed-language and unsupported-script benchmark cases.

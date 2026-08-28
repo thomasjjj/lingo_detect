@@ -16,6 +16,7 @@ class DetectorTests(unittest.TestCase):
         self.assertEqual(detect("ї").language_code, "uk")
         self.assertEqual(detect("ښ").language_code, "ps")
         self.assertEqual(detect("ٹ").language_code, "ur")
+        self.assertEqual(detect("ڭ").language_code, "ug")
 
     def test_ambiguous_character_falls_back_to_script(self) -> None:
         cyrillic = detect("а")
@@ -26,6 +27,17 @@ class DetectorTests(unittest.TestCase):
     def test_both_uzbek_scripts_map_to_uz(self) -> None:
         self.assertEqual(detect("oʻzbekiston respublikasi").language_code, "uz")
         self.assertEqual(detect("ҳар бир инсон ҳуқуқига эгадир").language_code, "uz")
+
+    def test_uighur_alphabets_map_to_ug(self) -> None:
+        samples = {
+            "Arab": "ھەر بىر ئىنسان ئەركىن تۇغۇلىدۇ",
+            "Latn": "her bir insan erkin tughulidu",
+            "Cyrl": "һәр бир инсан әркин туғулиду",
+            "Latn-UYY": "ⱨər bir insan ərkin tuƣulidu",
+        }
+        for alphabet, text in samples.items():
+            with self.subTest(alphabet=alphabet):
+                self.assertEqual(detect(text).language_code, "ug")
 
     def test_mixed_latin_acronym_does_not_hide_native_script(self) -> None:
         result = detect("GMT کې د")

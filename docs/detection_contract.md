@@ -2,7 +2,9 @@
 
 Language detection should preserve the highest resolution justified by the
 input. A detector must not force a language code when it only has enough
-evidence for a writing system.
+evidence for a writing system. Uyghur always uses ISO 639-1 `ug`; its Arabic,
+Cyrillic, and Latin orthographies are represented by the ISO 15924 script code
+in the separate `script` field.
 
 The recommended Python result shape is:
 

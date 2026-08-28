@@ -16,6 +16,19 @@ from collections import Counter
 from html.parser import HTMLParser
 from pathlib import Path
 
+try:
+    from .uyghur_transliteration import (
+        arabic_to_cyrillic,
+        arabic_to_latin,
+        arabic_to_new_script,
+    )
+except ImportError:  # Support ``python tools/build_test_samples.py``.
+    from uyghur_transliteration import (
+        arabic_to_cyrillic,
+        arabic_to_latin,
+        arabic_to_new_script,
+    )
+
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "tests" / "data" / "flores200_devtest.jsonl"
@@ -50,6 +63,12 @@ LANGUAGES = {
     "tg": {"name": "Tajik", "flores": "tgk_Cyrl", "script": "Cyrl"},
     "uk": {"name": "Ukrainian", "flores": "ukr_Cyrl", "script": "Cyrl"},
     "ur": {"name": "Urdu", "flores": "urd_Arab", "script": "Arab"},
+    "ug": {
+        "name": "Uyghur",
+        "flores": "uig_Arab",
+        "script": "Arab",
+        "alphabet": "Uyghur Arabic (UEY)",
+    },
     "uz": {
         "name": "Uzbek",
         "flores": "uzn_Latn",
@@ -178,6 +197,7 @@ def build_cases(archive_path: Path) -> list[dict]:
                             "expected_language": language_code,
                             "language_name": language["name"],
                             "script": language["script"],
+                            "alphabet": language.get("alphabet"),
                             "variety": language.get("variety"),
                             "word_count": word_count,
                             "text": text,
@@ -191,6 +211,38 @@ def build_cases(archive_path: Path) -> list[dict]:
                         }
                     )
     return cases
+
+
+def build_transliterated_uighur_cases(cases: list[dict]) -> list[dict]:
+    """Create parallel held-out cases for three additional Uyghur alphabets."""
+    variants = {
+        "latn": ("Latn", "Uyghur Latin (ULY)", arabic_to_latin),
+        "cyrl": ("Cyrl", "Uyghur Cyrillic (UKY)", arabic_to_cyrillic),
+        "yengi": ("Latn", "Uyghur New Script (UYY)", arabic_to_new_script),
+    }
+    generated = []
+    for case in cases:
+        if case["expected_language"] != "ug" or case["script"] != "Arab":
+            continue
+        for variant, (script, alphabet, converter) in variants.items():
+            converted = converter(case["text"])
+            source = dict(case["source"])
+            source["transliteration"] = {
+                "from": "Uyghur Arabic (UEY)",
+                "to": alphabet,
+                "method": "deterministic alphabet mapping",
+            }
+            generated.append(
+                {
+                    **case,
+                    "id": case["id"].replace("ug-", f"ug-{variant}-", 1),
+                    "script": script,
+                    "alphabet": alphabet,
+                    "text": converted,
+                    "source": source,
+                }
+            )
+    return generated
 
 
 def build_northern_pashto_cases(html: str) -> list[dict]:
@@ -322,6 +374,7 @@ def main() -> None:
                 f"archive SHA-256 mismatch: expected {ARCHIVE_SHA256}, got {actual_hash}"
             )
         cases = build_cases(archive_path)
+        cases.extend(build_transliterated_uighur_cases(cases))
         cases.extend(build_cyrillic_uzbek_cases(download_bytes(TATOEBA_UZBEK_URL)))
         cases.extend(build_northern_pashto_cases(download_text(NORTHERN_PASHTO_URL)))
 

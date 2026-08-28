@@ -25,7 +25,12 @@ def script_of(character: str) -> str:
 
 
 def label(path: Path) -> str:
-    suffix = "/cyrl" if path.stem.endswith("_cyrl") else ""
+    suffixes = {
+        "sample_cyrl": "/cyrl",
+        "sample_latn": "/latn",
+        "sample_yengi": "/yengi",
+    }
+    suffix = suffixes.get(path.stem, "")
     return f"{path.parent.name}{suffix}"
 
 
@@ -83,9 +88,9 @@ def main() -> None:
         print(f"  top-bigrams: {formatted_bigrams}")
 
     diagnostic_characters = {
-        "Arabic-script": "ةأإآؤئءىپچژگٹڈڑںھہےټځڅډړږښګڼېۍ",
-        "Cyrillic-script": "ёыэъщцґєіїғӣқӯҳҷў",
-        "Latin-script": "qwxʻʼ",
+        "Arabic-script": "ةأإآؤئءىپچژگٹڈڑںھہےټځڅډړږښګڼېۍەڭۆۇۈۋ",
+        "Cyrillic-script": "ёыэъщцґєіїғӣқӯҳҷўәҗңөүһ",
+        "Latin-script": "qwxʻʼëéöüəƣɵⱨⱪⱬ",
     }
     print("\n[diagnostic-character-counts]")
     for group, characters in diagnostic_characters.items():
