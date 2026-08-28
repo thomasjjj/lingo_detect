@@ -20,6 +20,7 @@ SCRIPT_NAMES = {"Arab": "Arabic", "Cyrl": "Cyrillic", "Latn": "Latin"}
 LANGUAGE_NAMES = {
     "ar": "Arabic",
     "en": "English",
+    "fa": "Persian (Farsi)",
     "ps": "Pashto",
     "ru": "Russian",
     "tg": "Tajik",
@@ -37,6 +38,10 @@ CUE_WORDS = {
     "en": {
         "the", "of", "and", "to", "in", "or", "is", "are", "that", "this",
         "with", "for", "from", "shall", "has", "have", "not", "every", "all",
+    },
+    "fa": {
+        "از", "آن", "این", "است", "با", "برای", "به", "بود", "در", "را",
+        "که", "و", "هر", "همه", "هیچ", "یک", "خود", "شود", "دارد", "نیز",
     },
     "ps": {
         "د", "په", "او", "چې", "له", "څوک", "شي", "وي", "نه", "هغه", "سره",
@@ -82,6 +87,8 @@ CUE_WORDS = {
 DISTINCTIVE_CHARACTERS = {
     "ar": {character: 2.3 for character in "ةأإؤئءى"} | {"آ": 1.5},
     "en": {"w": 1.1},
+    "fa": {"ۀ": 3.0, "ک": 0.7, "ی": 0.45}
+    | {character: 0.3 for character in "پچژگ"},
     "ps": {character: 3.2 for character in "ټځڅډړږښګڼېۍ"}
     | {character: 0.5 for character in "پچژ"},
     "ru": {"ы": 3.0, "щ": 0.5, "ъ": 0.3},
@@ -89,7 +96,6 @@ DISTINCTIVE_CHARACTERS = {
     | {character: 0.7 for character in "ғқҳ"},
     "uk": {character: 3.2 for character in "іїєґ"},
     "ur": {character: 3.0 for character in "ٹڈڑںھہے"}
-    | {"ی": 1.6}
     | {character: 0.4 for character in "پچژگ"},
     "ug": {character: 3.2 for character in "ەڭۆۇۈۋې"}
     | {"ى": 1.0}

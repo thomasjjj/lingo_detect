@@ -31,6 +31,22 @@ class MixedDetectionTests(unittest.TestCase):
             self.assertIsInstance(segment, DetectionSegment)
             self.assertEqual(text[segment.start : segment.end], segment.text)
 
+    def test_english_around_persian_span(self) -> None:
+        text = (
+            "The Persian statement حقوق بشر در این کشور بسیار مهم است means that "
+            "human rights are very important here, "
+            "and this explanation is English."
+        )
+        result = detect_mixed(text)
+
+        self.assertEqual(result.scripts, ("Latn", "Arab"))
+        self.assertEqual(result.language_codes, ("en", "fa"))
+        self.assertEqual(
+            [(segment.script, segment.language_code) for segment in result.segments],
+            [("Latn", "en"), ("Arab", "fa"), ("Latn", "en")],
+        )
+        self.assertEqual("".join(segment.text for segment in result.segments), text)
+
     def test_short_wikipedia_name_preserves_script_fallback(self) -> None:
         text = "Moscow (Russian: Москва) is the capital of Russia."
         result = detect_mixed(text)

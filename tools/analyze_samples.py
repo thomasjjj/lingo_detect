@@ -88,7 +88,7 @@ def main() -> None:
         print(f"  top-bigrams: {formatted_bigrams}")
 
     diagnostic_characters = {
-        "Arabic-script": "ةأإآؤئءىپچژگٹڈڑںھہےټځڅډړږښګڼېۍەڭۆۇۈۋ",
+        "Arabic-script": "ةأإآؤئءىكکيیۀپچژگٹڈڑںھہےټځڅډړږښګڼېۍەڭۆۇۈۋ",
         "Cyrillic-script": "ёыэъщцґєіїғӣқӯҳҷўәҗңөүһ",
         "Latin-script": "qwxʻʼëéöüəƣɵⱨⱪⱬ",
     }

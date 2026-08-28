@@ -7,6 +7,7 @@ elements; document titles and article-number headings are deliberately omitted.
 
 from __future__ import annotations
 
+import argparse
 import json
 import re
 import time
@@ -35,6 +36,7 @@ USER_AGENT = "lingo-detect-corpus-builder/0.1 (educational language research)"
 LANGUAGES = {
     "arabic": {"code": "ar", "files": {"sample.txt": "arb.html"}},
     "english": {"code": "en", "files": {"sample.txt": "eng.html"}},
+    "persian": {"code": "fa", "files": {"sample.txt": "pes_1.html"}},
     "pashto": {"code": "ps", "files": {"sample.txt": "pbu.html"}},
     "russian": {"code": "ru", "files": {"sample.txt": "rus.html"}},
     "tajik": {"code": "tg", "files": {"sample.txt": "tgk.html"}},
@@ -106,9 +108,23 @@ def extract_sample(html: str) -> tuple[str, int]:
     return sample, len(words)
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--language",
+        choices=sorted(LANGUAGES),
+        help="Build one corpus directory instead of rebuilding every language",
+    )
+    return parser.parse_args()
+
+
 def main() -> None:
+    args = parse_args()
     retrieved_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
-    for directory_name, language in LANGUAGES.items():
+    selected = (
+        {args.language: LANGUAGES[args.language]} if args.language else LANGUAGES
+    )
+    for directory_name, language in selected.items():
         destination = CORPORA / directory_name
         destination.mkdir(parents=True, exist_ok=True)
         sources = []

@@ -5,6 +5,9 @@ Each language directory contains a 1,000-whitespace-token UTF-8 sample in
 1,000-token Cyrillic sample because both Latin and Cyrillic Uzbek occur in real
 input; both map to `uz`.
 
+The Persian directory uses the Western Farsi (`pes_1`) UDHR source, rather than
+the separate Dari (`pes_2`) source in the upstream package, and maps to `fa`.
+
 Uyghur contains four 1,000-token samples, all mapping to `ug`:
 
 - `sample.txt`: source Uyghur Arabic (UEY)
@@ -26,4 +29,10 @@ Regenerate all samples with:
 
 ```powershell
 python .\tools\build_samples.py
+```
+
+To rebuild only one directory, use `--language`, for example:
+
+```powershell
+python .\tools\build_samples.py --language persian
 ```

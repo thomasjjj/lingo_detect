@@ -27,6 +27,7 @@ SCRIPT_ALIASES = {
 LANGUAGE_SCRIPTS = {
     "ar": "Arab",
     "en": "Latn",
+    "fa": "Arab",
     "ps": "Arab",
     "ru": "Cyrl",
     "tg": "Cyrl",

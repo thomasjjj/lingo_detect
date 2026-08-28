@@ -23,6 +23,7 @@ classifier.
 - Different confidence thresholds for very short and longer inputs.
 - Unicode normalization and support for common apostrophe variants.
 - Multiple orthographies for Uyghur and Uzbek.
+- Western Persian/Farsi coverage using ISO 639-1 `fa`.
 - No runtime dependencies or external services.
 - Packaged language profiles, so detection works offline.
 
@@ -32,6 +33,7 @@ classifier.
 |---|---:|---|
 | Arabic | `ar` | Arabic (`Arab`) |
 | English | `en` | Latin (`Latn`) |
+| Persian (Farsi) | `fa` | Arabic (`Arab`), with Western Persian evaluation coverage |
 | Pashto | `ps` | Arabic (`Arab`), including Northern and Southern evaluation coverage |
 | Russian | `ru` | Cyrillic (`Cyrl`) |
 | Tajik | `tg` | Cyrillic (`Cyrl`) |
@@ -287,6 +289,11 @@ language-specific statistical evidence.
    evidence determine whether to return a language. Short inputs require much
    stronger evidence; otherwise the detector returns the script alone.
 
+Persian shares its script and many letters with Arabic, Pashto, Urdu, and
+Uyghur. It therefore relies especially on Persian-form `ک` and `ی`, cue words
+such as `در`, `به`, `که`, and `است`, and its n-gram profile. Those letters are
+not treated as proof on their own because Urdu and Pashto use them too.
+
 `detect()` returns one result for the entire input. A Latin acronym inside
 otherwise Arabic or Cyrillic text normally does not hide the dominant native
 script. Use `detect_mixed()` when the individual spans matter.
@@ -323,7 +330,7 @@ network access. Rebuilding profiles from existing local samples does not.
 
 ## Evaluation
 
-The held-out suite contains 560 cases covering every supported language at 1,
+The held-out suite contains 600 cases covering every supported language at 1,
 2, 3, 5, 10, 20, 50, and 100 words. It separately counts exact-language
 answers, correct script-only fallbacks, and wrong answers.
 
@@ -331,10 +338,10 @@ Current results for the bundled detector are:
 
 | Outcome | Cases | Rate |
 |---|---:|---:|
-| Exact language | 436/560 | 77.9% |
-| Correct script-only fallback | 124/560 | 22.1% |
-| Useful language or script resolution | 560/560 | 100.0% |
-| Wrong | 0/560 | 0.0% |
+| Exact language | 465/600 | 77.5% |
+| Correct script-only fallback | 135/600 | 22.5% |
+| Useful language or script resolution | 600/600 | 100.0% |
+| Wrong | 0/600 | 0.0% |
 
 All cases of 20, 50, and 100 words resolve to the exact language in this suite.
 Short ambiguous text deliberately accounts for most script-only results.

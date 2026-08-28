@@ -28,6 +28,11 @@ class DetectorTests(unittest.TestCase):
         self.assertEqual(detect("oʻzbekiston respublikasi").language_code, "uz")
         self.assertEqual(detect("ҳар бир инсон ҳуқуқига эгадир").language_code, "uz")
 
+    def test_persian_is_detected(self) -> None:
+        result = detect("این یک متن فارسی برای آزمایش تشخیص زبان است")
+        self.assertEqual((result.script, result.language_code), ("Arab", "fa"))
+        self.assertEqual(result.label, "Arabic · Persian (Farsi)")
+
     def test_uighur_alphabets_map_to_ug(self) -> None:
         samples = {
             "Arab": "ھەر بىر ئىنسان ئەركىن تۇغۇلىدۇ",

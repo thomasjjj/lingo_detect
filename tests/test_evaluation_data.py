@@ -9,7 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CASES_PATH = ROOT / "tests" / "data" / "flores200_devtest.jsonl"
-LANGUAGES = {"ar", "en", "ps", "ru", "tg", "ug", "uk", "ur", "uz"}
+LANGUAGES = {"ar", "en", "fa", "ps", "ru", "tg", "ug", "uk", "ur", "uz"}
 LENGTHS = {1, 2, 3, 5, 10, 20, 50, 100}
 CASES_PER_BUCKET = 5
 

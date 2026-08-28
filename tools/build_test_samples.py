@@ -53,6 +53,12 @@ TATOEBA_UZBEK_SHA256 = (
 LANGUAGES = {
     "ar": {"name": "Arabic", "flores": "arb_Arab", "script": "Arab"},
     "en": {"name": "English", "flores": "eng_Latn", "script": "Latn"},
+    "fa": {
+        "name": "Persian (Farsi)",
+        "flores": "pes_Arab",
+        "script": "Arab",
+        "variety": "Western",
+    },
     "ps": {
         "name": "Pashto",
         "flores": "pbt_Arab",

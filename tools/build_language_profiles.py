@@ -18,6 +18,7 @@ APOSTROPHES = str.maketrans({"‘": "'", "’": "'", "ʻ": "'", "ʼ": "'", "`": 
 SOURCES = {
     "ar-Arab": ("ar", "Arab", ROOT / "corpora" / "arabic" / "sample.txt"),
     "en-Latn": ("en", "Latn", ROOT / "corpora" / "english" / "sample.txt"),
+    "fa-Arab": ("fa", "Arab", ROOT / "corpora" / "persian" / "sample.txt"),
     "ps-Arab": ("ps", "Arab", ROOT / "corpora" / "pashto" / "sample.txt"),
     "ru-Cyrl": ("ru", "Cyrl", ROOT / "corpora" / "russian" / "sample.txt"),
     "tg-Cyrl": ("tg", "Cyrl", ROOT / "corpora" / "tajik" / "sample.txt"),
