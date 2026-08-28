@@ -71,18 +71,52 @@ analysis and appropriate human review.
 
 Python 3.12 or newer is required.
 
-Install the project from a local checkout:
+The runtime package has no third-party dependencies. pip and uv use the same
+project metadata, and their environments can be kept side by side.
+
+### pip
+
+Install the project from a local checkout into a pip-managed environment:
 
 ```powershell
-py -3.12 -m venv .venv
-.\.venv\Scripts\Activate.ps1
+py -3.12 -m venv .venv-pip
+.\.venv-pip\Scripts\Activate.ps1
 python -m pip install .
 ```
 
-For development, use an editable installation:
+For development, install the package in editable mode together with its `dev`
+extra:
 
 ```powershell
-python -m pip install -e .
+python -m pip install -e ".[dev]"
+python -m unittest discover -s .\tests -v
+python .\tools\evaluate_detector.py
+python -m build --wheel
+```
+
+### uv
+
+uv uses its own `.venv` and the committed `uv.lock`, so it can coexist with the
+pip environment above. If needed, install it using the
+[official uv instructions](https://docs.astral.sh/uv/getting-started/installation/).
+Create a locked editable development environment with:
+
+```powershell
+uv sync --locked --extra dev
+```
+
+Run the same checks and build through uv:
+
+```powershell
+uv run --locked python -m unittest discover -s .\tests -v
+uv run --locked python .\tools\evaluate_detector.py
+uv run --locked --extra dev python -m build --wheel
+```
+
+For a non-editable local installation instead, use:
+
+```powershell
+uv sync --locked --no-editable
 ```
 
 The package can also be imported directly while the repository root is the

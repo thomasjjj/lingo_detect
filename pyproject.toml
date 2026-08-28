@@ -1,9 +1,14 @@
 [project]
 name = "lingo-detect"
-version = "0.6.0"
+version = "0.6.1"
 description = "Script-first language detection with uncertainty fallbacks"
 requires-python = ">=3.12"
 dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "build>=1.2,<2",
+]
 
 [build-system]
 requires = ["setuptools>=69"]

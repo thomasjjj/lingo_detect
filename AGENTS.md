@@ -49,13 +49,18 @@ Before making changes:
 
 Use this section to record confirmed commands as the project matures.
 
-- Test: `python -m unittest discover -s .\tests -v`
-- Evaluate: `python .\tools\evaluate_detector.py`
+- Install development (pip): `python -m pip install -e ".[dev]"`
+- Install development (uv): `uv sync --locked --extra dev`
+- Test (pip): `python -m unittest discover -s .\tests -v`
+- Test (uv): `uv run --locked python -m unittest discover -s .\tests -v`
+- Evaluate (pip): `python .\tools\evaluate_detector.py`
+- Evaluate (uv): `uv run --locked python .\tools\evaluate_detector.py`
 - Generate corpora: `python .\tools\build_samples.py`
 - Generate FLORES corpora: `python .\tools\build_flores_samples.py`
 - Generate profiles: `python .\tools\build_language_profiles.py`
 - Generate evaluation data: `python .\tools\build_test_samples.py`
-- Build: `py -3.12 -m build`
+- Build (pip): `python -m build --wheel`
+- Build (uv): `uv run --locked --extra dev python -m build --wheel`
 
 Guidelines:
 
