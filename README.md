@@ -448,12 +448,28 @@ A language may have more than one profile for the same script. The detector
 keeps that language's best matching profile before ranking it against other
 languages, which is how multiple Latin Uyghur orthographies can share `ug`.
 
+## Known issues
+
+### Unsupported same-script languages can be misclassified
+
+This detector uses a closed candidate set rather than performing universal
+language identification. When an unsupported language uses a supported script,
+the detector ranks the text only against the registered languages for that
+script. It may return a script-only result, or it may incorrectly resolve the
+text to a supported language when the score passes the normal thresholds. For
+example, French text may sometimes resolve to English, although English is not
+a fixed fallback and another supported Latin-script language may rank first.
+The ranking reflects profile evidence, not linguistic relatedness.
+
+Use this tool when the caller is reasonably confident that the text being
+analysed is in one of the [supported languages](#supported-languages-and-writing-systems).
+For unrestricted input, validate that assumption before detection and do not
+treat a returned language code as proof that the input belongs to the supported
+set.
+
 ## Limitations
 
-- This is a closed candidate set, not universal language identification.
-- Unsupported scripts return no resolution, but an unsupported language written
-  in any supported script may resemble and be assigned to a supported language.
-  Validate the regional candidate-set assumption at the application boundary.
+- Unsupported scripts return no resolution.
 - Variety labels are not returned: Arabic varieties share `ar`, Dari and Western
   Persian share `fa`, Kurdish varieties share `ku`, and Azerbaijani varieties
   share `az`.
