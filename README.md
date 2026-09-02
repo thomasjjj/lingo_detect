@@ -182,6 +182,74 @@ The alternative scores are normalized relative evidence scores among the
 supported candidates for that script. They have not yet been statistically
 calibrated and should not be presented as real-world probabilities.
 
+### Resolution examples
+
+The three possible `DetectionResult.resolution` values look like this:
+
+```python
+from lingo_detect import detect
+
+
+def resolution_summary(text: str) -> dict:
+    result = detect(text)
+    return {
+        "resolution": result.resolution,
+        "script": result.script,
+        "language_code": result.language_code,
+    }
+
+
+print(
+    resolution_summary(
+        "Tous les êtres humains naissent libres et égaux en dignité et en droits."
+    )
+)
+# {'resolution': 'language', 'script': 'Latn', 'language_code': 'fr'}
+
+print(resolution_summary("Москва"))
+# {'resolution': 'script', 'script': 'Cyrl', 'language_code': None}
+
+print(resolution_summary("123 — !!!"))
+# {'resolution': 'none', 'script': None, 'language_code': None}
+```
+
+These outcomes mean:
+
+| Resolution | Fields you can rely on | Typical cause |
+|---|---|---|
+| `language` | `script` and `language_code` are set | The text contains enough evidence for a supported language |
+| `script` | `script` is set; `language_code` is `None` | The writing system is clear, but the language is ambiguous or unsupported |
+| `none` | Both fields are `None`; `alternatives` is empty | The input is empty or contains no letters from a recognized script |
+
+A script-only result can have `confidence == 1.0`. For example, every
+recognized letter in `Москва` is Cyrillic, so its script confidence is `1.0`,
+even though the word alone does not justify choosing Russian over every other
+supported Cyrillic language. Its `alternatives` still contain ranked language
+candidates, but they remain tentative.
+
+`detect_mixed()` does not introduce a fourth resolution. It returns a
+`MixedDetectionResult` whose `primary` result and individual segments each use
+one of the three resolutions above:
+
+```python
+from lingo_detect import detect_mixed
+
+result = detect_mixed(
+    "This is English. Каждый человек имеет право на свободу."
+)
+
+print(result.scripts)         # ('Latn', 'Cyrl')
+print(result.language_codes)  # ('en', 'ru')
+print(result.is_mixed)        # True
+print(
+    [(segment.resolution, segment.language_code) for segment in result.segments]
+)
+# [('language', 'en'), ('language', 'ru')]
+```
+
+See [Detecting mixed languages and scripts](#detecting-mixed-languages-and-scripts)
+for offsets, unresolved segments, and complete serialization details.
+
 ### Converting a result to a dictionary or JSON
 
 ```python
