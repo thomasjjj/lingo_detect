@@ -47,14 +47,56 @@ SAMPLES = {
     "azerbaijani": {
         "sample_arab.txt": ("az", "azb_Arab", "South Azerbaijani"),
     },
+    "bengali": {
+        "sample.txt": ("bn", "ben_Beng", "Bengali"),
+    },
+    "chinese": {
+        "sample.txt": ("zh", "zho_Hans", "Mandarin Chinese (Simplified)"),
+    },
+    "french": {
+        "sample.txt": ("fr", "fra_Latn", "French"),
+    },
+    "german": {
+        "sample.txt": ("de", "deu_Latn", "Standard German"),
+    },
+    "hausa": {
+        "sample.txt": ("ha", "hau_Latn", "Hausa"),
+    },
+    "hindi": {
+        "sample.txt": ("hi", "hin_Deva", "Hindi"),
+    },
+    "indonesian": {
+        "sample.txt": ("id", "ind_Latn", "Indonesian"),
+    },
+    "japanese": {
+        "sample.txt": ("ja", "jpn_Jpan", "Japanese"),
+    },
     "kurdish": {
         "sample.txt": ("ku", "ckb_Arab", "Central Kurdish (Sorani)"),
+    },
+    "marathi": {
+        "sample.txt": ("mr", "mar_Deva", "Marathi"),
     },
     "persian": {
         "sample_dari.txt": ("fa", "prs_Arab", "Dari"),
     },
+    "portuguese": {
+        "sample.txt": ("pt", "por_Latn", "Portuguese"),
+    },
     "sindhi": {
         "sample.txt": ("sd", "snd_Arab", "Sindhi"),
+    },
+    "spanish": {
+        "sample.txt": ("es", "spa_Latn", "Spanish"),
+    },
+    "swahili": {
+        "sample.txt": ("sw", "swh_Latn", "Swahili"),
+    },
+    "telugu": {
+        "sample.txt": ("te", "tel_Telu", "Telugu"),
+    },
+    "vietnamese": {
+        "sample.txt": ("vi", "vie_Latn", "Vietnamese"),
     },
 }
 

@@ -1,4 +1,4 @@
-"""Build deterministic held-out language-identification cases from FLORES-200."""
+"""Build deterministic held-out cases from pinned multilingual corpora."""
 
 from __future__ import annotations
 
@@ -92,7 +92,20 @@ TATOEBA_UZBEK_URL = (
     "https://downloads.tatoeba.org/exports/per_language/uzb/uzb_sentences.tsv.bz2"
 )
 TATOEBA_UZBEK_SHA256 = (
-    "3fb90d8e219e7580b0779ee7dc8701a456a21e2b1d01fe52eed1ca7b0c664283"
+    "08c5d375d6cd9bef2b1610ccf1ad9d39e3559c4c2536c5adfd60253d5292e048"
+)
+NAIJA_NSC_COMMIT = "e1208ebb7111cf1180964d5a0012b6b273752324"
+NAIJA_NSC_RAW_ROOT = (
+    "https://raw.githubusercontent.com/UniversalDependencies/UD_Naija-NSC/"
+    f"{NAIJA_NSC_COMMIT}"
+)
+NAIJA_NSC_TRAIN_URL = f"{NAIJA_NSC_RAW_ROOT}/pcm_nsc-ud-train.conllu"
+NAIJA_NSC_TEST_URL = f"{NAIJA_NSC_RAW_ROOT}/pcm_nsc-ud-test.conllu"
+NAIJA_NSC_TRAIN_SHA256 = (
+    "2ecbbbd970575573da99c82897a08ce8c32ddc4f88d65bdc213e30e772ee4804"
+)
+NAIJA_NSC_TEST_SHA256 = (
+    "59bb428a3435ed09f4e9cf9738d47875ba89f16f7fcd4f48d33b264c3e74bad9"
 )
 
 LANGUAGES = {
@@ -134,7 +147,13 @@ LANGUAGES = {
         "code": "az", "name": "Azerbaijani", "flores": "azb_Arab",
         "script": "Arab", "variety": "South",
     },
+    "bn": {
+        "name": "Bengali", "flores": "ben_Beng", "script": "Beng",
+        "minimum_script_share": 0.70,
+    },
+    "de": {"name": "German", "flores": "deu_Latn", "script": "Latn"},
     "en": {"name": "English", "flores": "eng_Latn", "script": "Latn"},
+    "es": {"name": "Spanish", "flores": "spa_Latn", "script": "Latn"},
     "fa": {
         "name": "Persian (Farsi)",
         "flores": "pes_Arab",
@@ -148,8 +167,19 @@ LANGUAGES = {
         "script": "Arab",
         "variety": "Dari",
     },
+    "fr": {"name": "French", "flores": "fra_Latn", "script": "Latn"},
+    "ha": {"name": "Hausa", "flores": "hau_Latn", "script": "Latn"},
     "he": {"name": "Hebrew", "flores": "heb_Hebr", "script": "Hebr"},
+    "hi": {
+        "name": "Hindi", "flores": "hin_Deva", "script": "Deva",
+        "minimum_script_share": 0.70,
+    },
     "hy": {"name": "Armenian", "flores": "hye_Armn", "script": "Armn"},
+    "id": {"name": "Indonesian", "flores": "ind_Latn", "script": "Latn"},
+    "ja": {
+        "name": "Japanese", "flores": "jpn_Jpan", "script": "Jpan",
+        "minimum_script_share": 0.70,
+    },
     "ka": {"name": "Georgian", "flores": "kat_Geor", "script": "Geor"},
     "kk": {"name": "Kazakh", "flores": "kaz_Cyrl", "script": "Cyrl"},
     "ku": {
@@ -157,18 +187,28 @@ LANGUAGES = {
         "variety": "Central (Sorani)",
     },
     "ky": {"name": "Kyrgyz", "flores": "kir_Cyrl", "script": "Cyrl"},
+    "mr": {
+        "name": "Marathi", "flores": "mar_Deva", "script": "Deva",
+        "minimum_script_share": 0.70,
+    },
     "ps": {
         "name": "Pashto",
         "flores": "pbt_Arab",
         "script": "Arab",
         "variety": "Southern",
     },
+    "pt": {"name": "Portuguese", "flores": "por_Latn", "script": "Latn"},
     "ru": {"name": "Russian", "flores": "rus_Cyrl", "script": "Cyrl"},
     "sd": {
         "name": "Sindhi",
         "flores": "snd_Arab",
         "script": "Arab",
         "filter_nonlexical_tokens": True,
+    },
+    "sw": {"name": "Swahili", "flores": "swh_Latn", "script": "Latn"},
+    "te": {
+        "name": "Telugu", "flores": "tel_Telu", "script": "Telu",
+        "minimum_script_share": 0.70,
     },
     "tg": {"name": "Tajik", "flores": "tgk_Cyrl", "script": "Cyrl"},
     "tk": {"name": "Turkmen", "flores": "tuk_Latn", "script": "Latn"},
@@ -187,9 +227,18 @@ LANGUAGES = {
         "script": "Latn",
         "variety": "Northern",
     },
+    "vi": {"name": "Vietnamese", "flores": "vie_Latn", "script": "Latn"},
     "yi": {
         "name": "Yiddish", "flores": "ydd_Hebr", "script": "Hebr",
         "variety": "Eastern",
+    },
+    "zh": {
+        "name": "Mandarin Chinese",
+        "flores": "zho_Hans",
+        "script": "Hani",
+        "variety": "Simplified",
+        "filter_nonlexical_tokens": True,
+        "minimum_script_share": 0.70,
     },
 }
 
@@ -260,12 +309,41 @@ def read_language_lines(
     ]
 
 
+def declared_script_share(text: str, script: str) -> float:
+    names = [
+        unicodedata.name(character, "")
+        for character in text
+        if character.isalpha()
+    ]
+    if not names:
+        return 0.0
+    if script == "Jpan":
+        matching = sum(
+            "HIRAGANA" in name
+            or "KATAKANA" in name
+            or "CJK UNIFIED IDEOGRAPH" in name
+            or "CJK COMPATIBILITY IDEOGRAPH" in name
+            for name in names
+        )
+    else:
+        unicode_name = {
+            "Beng": "BENGALI",
+            "Deva": "DEVANAGARI",
+            "Hani": "CJK",
+            "Telu": "TELUGU",
+        }[script]
+        matching = sum(unicode_name in name for name in names)
+    return matching / len(names)
+
+
 def choose_window(
     lines: list[str],
     word_count: int,
     rng: random.Random,
     used_starts: set[int],
     used_texts: set[str],
+    expected_script: str | None = None,
+    minimum_script_share: float = 0.0,
 ) -> tuple[str, int, int]:
     for _ in range(10_000):
         line_index = rng.randrange(len(lines))
@@ -288,10 +366,61 @@ def choose_window(
         text = " ".join(selected)
         if text in used_texts:
             continue
+        if (
+            expected_script
+            and declared_script_share(text, expected_script) < minimum_script_share
+        ):
+            continue
         used_starts.add(line_index)
         used_texts.add(text)
         return text, line_index + 1, final_line_index + 1
     raise RuntimeError(f"could not select a unique {word_count}-word window")
+
+
+def read_naija_texts(data: bytes) -> list[str]:
+    """Read normalized Nigerian Pidgin sentences from a pinned CoNLL-U file."""
+    actual_hash = hashlib.sha256(data).hexdigest()
+    known_hashes = {NAIJA_NSC_TRAIN_SHA256, NAIJA_NSC_TEST_SHA256}
+    if actual_hash not in known_hashes:
+        raise ValueError(f"NaijaSynCor SHA-256 mismatch: {actual_hash}")
+    prefix = "# text_ortho = "
+    return [
+        unicodedata.normalize("NFC", line.removeprefix(prefix).strip())
+        for line in data.decode("utf-8").splitlines()
+        if line.startswith(prefix) and line.removeprefix(prefix).strip()
+    ]
+
+
+def build_nigerian_pidgin_cases(data: bytes) -> list[dict]:
+    texts = read_naija_texts(data)
+    used_starts: set[int] = set()
+    used_texts: set[str] = set()
+    cases = []
+    for word_count in TARGET_LENGTHS:
+        rng = random.Random(f"{RANDOM_SEED}:pcm_NSC:test:{word_count}")
+        for case_number in range(1, CASES_PER_LENGTH + 1):
+            text, sentence_start, sentence_end = choose_window(
+                texts, word_count, rng, used_starts, used_texts
+            )
+            cases.append(
+                {
+                    "id": f"pcm-{word_count:03}w-{case_number:02}",
+                    "expected_language": "pcm",
+                    "language_name": "Nigerian Pidgin",
+                    "script": "Latn",
+                    "word_count": word_count,
+                    "text": text,
+                    "source": {
+                        "dataset": "NaijaSynCor",
+                        "split": "test",
+                        "source_url": NAIJA_NSC_TEST_URL,
+                        "source_commit": NAIJA_NSC_COMMIT,
+                        "sentence_start": sentence_start,
+                        "sentence_end": sentence_end,
+                    },
+                }
+            )
+    return cases
 
 
 def build_cases(archive_path: Path) -> list[dict]:
@@ -317,7 +446,13 @@ def build_cases(archive_path: Path) -> list[dict]:
                 )
                 for case_number in range(1, CASES_PER_LENGTH + 1):
                     text, sentence_start, sentence_end = choose_window(
-                        lines, word_count, rng, used_starts, used_texts
+                        lines,
+                        word_count,
+                        rng,
+                        used_starts,
+                        used_texts,
+                        language["script"] if language.get("minimum_script_share") else None,
+                        language.get("minimum_script_share", 0.0),
                     )
                     cases.append(
                         {
@@ -553,6 +688,7 @@ def main() -> None:
             )
         cases = build_cases(archive_path)
         cases.extend(build_transliterated_uighur_cases(cases))
+        cases.extend(build_nigerian_pidgin_cases(download_bytes(NAIJA_NSC_TEST_URL)))
         cases.extend(build_cyrillic_uzbek_cases(download_bytes(TATOEBA_UZBEK_URL)))
         cases.extend(build_northern_pashto_cases(download_text(NORTHERN_PASHTO_URL)))
         for specification in REGIONAL_UDHR_SOURCES:

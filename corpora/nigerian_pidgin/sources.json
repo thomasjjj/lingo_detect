@@ -1,0 +1,19 @@
+{
+  "language": "nigerian_pidgin",
+  "language_code": "pcm",
+  "retrieved_at": "2026-09-02T05:54:26+00:00",
+  "source": "NaijaSynCor Universal Dependencies treebank",
+  "split": "train",
+  "source_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Naija-NSC/e1208ebb7111cf1180964d5a0012b6b273752324/pcm_nsc-ud-train.conllu",
+  "source_commit": "e1208ebb7111cf1180964d5a0012b6b273752324",
+  "source_sha256": "2ecbbbd970575573da99c82897a08ce8c32ddc4f88d65bdc213e30e772ee4804",
+  "license": "CC BY-SA 4.0",
+  "modified": "Extracted text_ortho sentences and truncated to 1,000 whitespace tokens",
+  "samples": [
+    {
+      "sample_file": "sample.txt",
+      "sample_word_count": 1000,
+      "source_sentence_count": 7278
+    }
+  ]
+}

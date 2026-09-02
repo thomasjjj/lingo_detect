@@ -2,16 +2,19 @@
 
 `flores200_devtest.jsonl` contains deterministic cases for these dimensions:
 
-- language: `ar`, `az`, `en`, `fa`, `he`, `hy`, `ka`, `kk`, `ku`, `ky`, `pa`,
-  `ps`, `ru`, `sd`, `tg`, `tk`, `tr`, `ug`, `uk`, `ur`, `uz`, `yi`
+- language: `ar`, `az`, `bn`, `de`, `en`, `es`, `fa`, `fr`, `ha`, `he`, `hi`,
+  `hy`, `id`, `ja`, `ka`, `kk`, `ku`, `ky`, `mr`, `pa`, `pcm`, `ps`, `pt`,
+  `ru`, `sd`, `sw`, `te`, `tg`, `tk`, `tr`, `ug`, `uk`, `ur`, `uz`, `vi`,
+  `yi`, `zh`
 - whitespace-token length: 1, 2, 3, 5, 10, 20, 50, 100
 
-The 29 FLORES language/variety configurations produce 1,160 cases. Another 40
-native Cyrillic Uzbek cases come from Tatoeba, 40 Northern Pashto cases come
-from held-out UDHR text, and the 40 Uyghur Arabic cases have three parallel
-alphabet conversions, adding 120. Disjoint UDHR suffixes add 16 Azerbaijani
-Cyrillic, 24 Kurmanji, 40 Western Punjabi, and 8 Turkmen Cyrillic cases. The
-complete suite therefore has 1,448 cases.
+The 43 FLORES language/variety configurations produce 1,720 cases. Another 40
+Nigerian Pidgin cases come from the NaijaSynCor test split, 40 native Cyrillic
+Uzbek cases come from Tatoeba, and 40 Northern Pashto cases come from held-out
+UDHR text. The 40 Uyghur Arabic cases have three parallel alphabet conversions,
+adding 120. Disjoint UDHR suffixes add 16 Azerbaijani Cyrillic, 24 Kurmanji, 40
+Western Punjabi, and 8 Turkmen Cyrillic cases. The complete suite therefore has
+2,048 cases.
 
 The packaged n-gram profiles do not use these case texts. Detector weights and
 resolution thresholds have, however, been iteratively checked against this
@@ -37,6 +40,19 @@ to Modern Standard Arabic; North and South Azerbaijani; Dari; Central Kurdish;
 Hebrew; Armenian; Georgian; Kazakh; Kyrgyz; Sindhi; Turkmen; and Eastern
 Yiddish. The corresponding profiles use FLORES `dev` only where the pinned UDHR
 checkout lacks the required variety, while these cases use `devtest`.
+
+The added global-language profiles use FLORES-200 `dev`, while their evaluation
+cases use `devtest`. Mandarin Chinese is represented by Simplified Chinese
+`zho_Hans`; the detector reports the generic Han script code `Hani` because
+individual shared Han characters do not establish an orthographic variant.
+Japanese reports `Jpan`, grouping Han characters with kana when kana provide
+Japanese context.
+
+Nigerian Pidgin uses ISO 639-3 `pcm` because no ISO 639-1 code is assigned. Its
+profile comes from the `train` split of the NaijaSynCor Universal Dependencies
+treebank, and these evaluation cases use its disjoint `test` split. The source
+revision and SHA-256 hashes are pinned in `tools/build_test_samples.py`;
+NaijaSynCor is licensed under CC BY-SA 4.0.
 
 Disjoint post-prefix UDHR cases cover Azerbaijani Cyrillic, Kurmanji Latin,
 Western Punjabi/Shahmukhi, and Turkmen Cyrillic. Their per-case token ranges are

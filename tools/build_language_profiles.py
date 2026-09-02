@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import re
 import unicodedata
 from collections import Counter
 from pathlib import Path
@@ -12,7 +11,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "lingo_detect" / "profiles.json"
 PROFILE_SIZE = 800
-WORD_PATTERN = re.compile(r"[^\W\d_]+(?:'[^\W\d_]+)*", re.UNICODE)
 APOSTROPHES = str.maketrans({"‘": "'", "’": "'", "ʻ": "'", "ʼ": "'", "`": "'"})
 
 SOURCES = {
@@ -26,19 +24,36 @@ SOURCES = {
     "az-Arab": ("az", "Arab", ROOT / "corpora" / "azerbaijani" / "sample_arab.txt"),
     "az-Cyrl": ("az", "Cyrl", ROOT / "corpora" / "azerbaijani" / "sample_cyrl.txt"),
     "az-Latn": ("az", "Latn", ROOT / "corpora" / "azerbaijani" / "sample.txt"),
+    "bn-Beng": ("bn", "Beng", ROOT / "corpora" / "bengali" / "sample.txt"),
+    "de-Latn": ("de", "Latn", ROOT / "corpora" / "german" / "sample.txt"),
     "en-Latn": ("en", "Latn", ROOT / "corpora" / "english" / "sample.txt"),
+    "es-Latn": ("es", "Latn", ROOT / "corpora" / "spanish" / "sample.txt"),
     "fa-Arab": ("fa", "Arab", ROOT / "corpora" / "persian" / "sample.txt"),
     "fa-Arab-Dari": ("fa", "Arab", ROOT / "corpora" / "persian" / "sample_dari.txt"),
+    "fr-Latn": ("fr", "Latn", ROOT / "corpora" / "french" / "sample.txt"),
+    "ha-Latn": ("ha", "Latn", ROOT / "corpora" / "hausa" / "sample.txt"),
     "he-Hebr": ("he", "Hebr", ROOT / "corpora" / "hebrew" / "sample.txt"),
+    "hi-Deva": ("hi", "Deva", ROOT / "corpora" / "hindi" / "sample.txt"),
     "hy-Armn": ("hy", "Armn", ROOT / "corpora" / "armenian" / "sample.txt"),
+    "id-Latn": ("id", "Latn", ROOT / "corpora" / "indonesian" / "sample.txt"),
+    "ja-Jpan": ("ja", "Jpan", ROOT / "corpora" / "japanese" / "sample.txt"),
     "ka-Geor": ("ka", "Geor", ROOT / "corpora" / "georgian" / "sample.txt"),
     "kk-Cyrl": ("kk", "Cyrl", ROOT / "corpora" / "kazakh" / "sample.txt"),
     "ku-Arab": ("ku", "Arab", ROOT / "corpora" / "kurdish" / "sample.txt"),
     "ku-Latn": ("ku", "Latn", ROOT / "corpora" / "kurdish" / "sample_latn.txt"),
     "ky-Cyrl": ("ky", "Cyrl", ROOT / "corpora" / "kyrgyz" / "sample.txt"),
+    "mr-Deva": ("mr", "Deva", ROOT / "corpora" / "marathi" / "sample.txt"),
     "pa-Arab": ("pa", "Arab", ROOT / "corpora" / "punjabi" / "sample.txt"),
+    "pcm-Latn": (
+        "pcm",
+        "Latn",
+        ROOT / "corpora" / "nigerian_pidgin" / "sample.txt",
+    ),
+    "pt-Latn": ("pt", "Latn", ROOT / "corpora" / "portuguese" / "sample.txt"),
     "ps-Arab": ("ps", "Arab", ROOT / "corpora" / "pashto" / "sample.txt"),
     "ru-Cyrl": ("ru", "Cyrl", ROOT / "corpora" / "russian" / "sample.txt"),
+    "sw-Latn": ("sw", "Latn", ROOT / "corpora" / "swahili" / "sample.txt"),
+    "te-Telu": ("te", "Telu", ROOT / "corpora" / "telugu" / "sample.txt"),
     "tg-Cyrl": ("tg", "Cyrl", ROOT / "corpora" / "tajik" / "sample.txt"),
     "tk-Cyrl": ("tk", "Cyrl", ROOT / "corpora" / "turkmen" / "sample_cyrl.txt"),
     "tk-Latn": ("tk", "Latn", ROOT / "corpora" / "turkmen" / "sample.txt"),
@@ -55,9 +70,38 @@ SOURCES = {
     ),
     "uz-Latn": ("uz", "Latn", ROOT / "corpora" / "uzbek" / "sample.txt"),
     "uz-Cyrl": ("uz", "Cyrl", ROOT / "corpora" / "uzbek" / "sample_cyrl.txt"),
+    "vi-Latn": ("vi", "Latn", ROOT / "corpora" / "vietnamese" / "sample.txt"),
     "sd-Arab": ("sd", "Arab", ROOT / "corpora" / "sindhi" / "sample.txt"),
     "yi-Hebr": ("yi", "Hebr", ROOT / "corpora" / "yiddish" / "sample.txt"),
+    "zh-Hani": ("zh", "Hani", ROOT / "corpora" / "chinese" / "sample.txt"),
 }
+
+
+def tokens(text: str) -> list[str]:
+    translated = text.translate(APOSTROPHES)
+    result: list[str] = []
+    current: list[str] = []
+    for index, character in enumerate(translated):
+        is_letter_or_mark = character.isalpha() or unicodedata.category(
+            character
+        ).startswith("M")
+        apostrophe_inside_word = (
+            character == "'"
+            and bool(current)
+            and index + 1 < len(translated)
+            and (
+                translated[index + 1].isalpha()
+                or unicodedata.category(translated[index + 1]).startswith("M")
+            )
+        )
+        if is_letter_or_mark or apostrophe_inside_word:
+            current.append(character)
+        elif current:
+            result.append("".join(current))
+            current = []
+    if current:
+        result.append("".join(current))
+    return result
 
 
 def ngrams(text: str) -> Counter[str]:
@@ -65,9 +109,8 @@ def ngrams(text: str) -> Counter[str]:
         unicodedata.normalize("NFKC", text)
         .casefold()
         .replace("i\u0307", "i")
-        .translate(APOSTROPHES)
     )
-    words = WORD_PATTERN.findall(normalised)
+    words = tokens(normalised)
     counts: Counter[str] = Counter()
     for word in words:
         padded = f"^{word}$"

@@ -33,15 +33,21 @@ mapping implementation and exhaustive core-letter tests are in
 
 Most samples are translations of the Universal Declaration of Human Rights from
 a pinned revision of the `wooorm/udhr` corpus. Varieties absent there use the
-FLORES-200 `dev` split; `devtest` is kept separate for evaluation. This material
-is intended for feature exploration, not as a large or representative message
-corpus. See the adjacent source metadata for provenance and licence details.
+FLORES-200 `dev` split; `devtest` is kept separate for evaluation. The global
+language expansion also uses this FLORES split for Bengali, Mandarin Chinese,
+French, German, Hausa, Hindi, Indonesian, Japanese, Marathi, Portuguese,
+Spanish, Swahili, Telugu, and Vietnamese. Nigerian Pidgin uses the `train` split
+of the pinned NaijaSynCor Universal Dependencies treebank, with its `test` split
+reserved for evaluation. This material is intended for feature exploration,
+not as a large or representative message corpus. See the adjacent source
+metadata for provenance and licence details.
 
 Regenerate all samples with:
 
 ```powershell
 python .\tools\build_samples.py
 python .\tools\build_flores_samples.py
+python .\tools\build_naija_sample.py
 ```
 
 To rebuild only one directory, use `--language`, for example:

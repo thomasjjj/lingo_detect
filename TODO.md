@@ -11,6 +11,7 @@
 - [x] Add the primary Middle Eastern and Central Asian regional language expansion.
 - [x] Support parallel pip and uv development workflows.
 - [x] Validate source-checkout execution and wheel packaging.
+- [x] Add the 15 highest-speaker unsupported languages, including French.
 - [ ] Calibrate reported confidence values on a larger multi-domain corpus.
 - [ ] Add a larger mixed-text and unsupported-script benchmark.
 - [ ] Add Balochi and independently sourced Arabic-script Kazakh coverage.

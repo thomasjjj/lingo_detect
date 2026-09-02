@@ -62,6 +62,34 @@ class DetectorTests(unittest.TestCase):
             with self.subTest(language_code=language_code):
                 self.assertEqual(detect(text).language_code, language_code)
 
+    def test_global_expansion_languages(self) -> None:
+        samples = {
+            "bn": "সকল মানুষ স্বাধীনভাবে সমান মর্যাদা এবং অধিকার নিয়ে জন্মগ্রহণ করে",
+            "de": "Alle Menschen sind frei und gleich an Würde und Rechten geboren",
+            "es": "Todos los seres humanos nacen libres e iguales en dignidad y derechos",
+            "fr": "Tous les êtres humains naissent libres et égaux en dignité et en droits",
+            "ha": "An haifi dukkan mutane da 'yanci kuma suna da mutunci da hakkoki",
+            "hi": "सभी मनुष्य स्वतंत्र और सम्मान तथा अधिकारों में समान जन्म लेते हैं",
+            "id": "Semua manusia dilahirkan bebas dan mempunyai martabat dan hak yang sama",
+            "ja": "すべての人間は、生まれながらにして自由であり、尊厳と権利について平等です",
+            "mr": "सर्व मानव स्वतंत्र जन्माला आले असून त्यांना समान प्रतिष्ठा आणि अधिकार आहेत",
+            "pcm": "How you dey now? I dey fine and we thank God",
+            "pt": "Todos os seres humanos nascem livres e iguais em dignidade e direitos",
+            "sw": "Watu wote wamezaliwa huru na wana hadhi na haki sawa",
+            "te": "మానవులందరూ స్వేచ్ఛగా సమాన గౌరవం మరియు హక్కులతో జన్మించారు",
+            "vi": "Mọi người sinh ra đều được tự do và bình đẳng về nhân phẩm và quyền",
+            "zh": "人人生而自由，在尊严和权利上一律平等",
+        }
+        for language_code, text in samples.items():
+            with self.subTest(language_code=language_code):
+                self.assertEqual(detect(text).language_code, language_code)
+
+    def test_chinese_and_japanese_writing_systems_are_distinguished(self) -> None:
+        chinese = detect("这是一个用于测试语言检测的中文句子")
+        japanese = detect("これは言語検出をテストするための日本語の文です")
+        self.assertEqual((chinese.script, chinese.language_code), ("Hani", "zh"))
+        self.assertEqual((japanese.script, japanese.language_code), ("Jpan", "ja"))
+
     def test_uighur_alphabets_map_to_ug(self) -> None:
         samples = {
             "Arab": "ھەر بىر ئىنسان ئەركىن تۇغۇلىدۇ",

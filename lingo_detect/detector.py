@@ -10,7 +10,6 @@ from functools import lru_cache
 from importlib.resources import files
 
 
-WORD_PATTERN = re.compile(r"[^\W\d_]+(?:'[^\W\d_]+)*", re.UNICODE)
 CLAUSE_BOUNDARY_PATTERN = re.compile(
     r"(?:\r\n|\r|\n|[.!?;:]+)[\t \f\v]*",
     re.UNICODE,
@@ -19,26 +18,44 @@ APOSTROPHES = str.maketrans({"‘": "'", "’": "'", "ʻ": "'", "ʼ": "'", "`": 
 SCRIPT_NAMES = {
     "Arab": "Arabic",
     "Armn": "Armenian",
+    "Beng": "Bengali",
     "Cyrl": "Cyrillic",
+    "Deva": "Devanagari",
     "Geor": "Georgian",
+    "Hani": "Han",
     "Hebr": "Hebrew",
+    "Jpan": "Japanese",
     "Latn": "Latin",
+    "Telu": "Telugu",
 }
 LANGUAGE_NAMES = {
     "ar": "Arabic",
     "az": "Azerbaijani",
+    "bn": "Bengali",
+    "de": "German",
     "en": "English",
+    "es": "Spanish",
     "fa": "Persian (Farsi)",
+    "fr": "French",
+    "ha": "Hausa",
     "he": "Hebrew",
+    "hi": "Hindi",
     "hy": "Armenian",
+    "id": "Indonesian",
+    "ja": "Japanese",
     "ka": "Georgian",
     "kk": "Kazakh",
     "ku": "Kurdish",
     "ky": "Kyrgyz",
+    "mr": "Marathi",
     "pa": "Punjabi",
+    "pcm": "Nigerian Pidgin",
+    "pt": "Portuguese",
     "ps": "Pashto",
     "ru": "Russian",
     "sd": "Sindhi",
+    "sw": "Swahili",
+    "te": "Telugu",
     "tg": "Tajik",
     "tk": "Turkmen",
     "tr": "Turkish",
@@ -46,7 +63,9 @@ LANGUAGE_NAMES = {
     "ur": "Urdu",
     "ug": "Uyghur",
     "uz": "Uzbek",
+    "vi": "Vietnamese",
     "yi": "Yiddish",
+    "zh": "Mandarin Chinese",
 }
 
 CUE_WORDS = {
@@ -61,22 +80,51 @@ CUE_WORDS = {
         "үчүн", "өз", "олан",
         "و", "کی", "ایله", "اوچون", "بیر", "او", "بو", "وار", "سونرا", "گؤره",
     },
+    "bn": {
+        "এবং", "ও", "এর", "এই", "একটি", "যে", "না", "জন্য", "থেকে", "হয়",
+        "করে", "সঙ্গে", "মানুষ", "সব", "কোনো",
+    },
+    "de": {
+        "der", "die", "das", "und", "in", "von", "zu", "den", "mit", "für",
+        "ist", "auf", "nicht", "ein", "eine", "als", "auch", "werden",
+    },
     "en": {
         "the", "of", "and", "to", "in", "or", "is", "are", "that", "this",
         "with", "for", "from", "shall", "has", "have", "not", "every", "all",
+    },
+    "es": {
+        "de", "la", "que", "el", "en", "y", "a", "los", "se", "del", "las",
+        "por", "un", "para", "con", "no", "una", "su", "al",
     },
     "fa": {
         "از", "آن", "این", "است", "با", "برای", "به", "بود", "در", "را",
         "که", "و", "هر", "همه", "هیچ", "یک", "خود", "شود", "دارد", "نیز",
     },
+    "fr": {
+        "de", "la", "le", "les", "des", "et", "à", "en", "un", "une", "du",
+        "que", "est", "pour", "dans", "pas", "sur", "ce", "qui",
+    },
+    "ha": {
+        "da", "na", "ne", "ni", "a", "cikin", "wani", "wannan", "ba", "ko",
+        "ya", "ta", "su", "don", "kuma", "daga", "zuwa",
+    },
     "he": {
         "של", "כל", "אדם", "או", "על", "את", "לא", "הוא", "היא", "זכאי",
         "החוק", "עם", "אם", "זה",
+    },
+    "hi": {
+        "और", "के", "का", "में", "से", "को", "है", "हैं", "एक", "यह",
+        "कि", "पर", "नहीं", "लिए", "भी", "कर", "हो",
     },
     "hy": {
         "ու", "ոք", "իրավունք", "ունի", "եւ", "կամ", "է", "իր", "յուրաքանչյուր",
         "այս", "ամեն", "ոչ", "չի", "են",
     },
+    "id": {
+        "yang", "dan", "di", "ke", "dari", "untuk", "dengan", "pada", "ini",
+        "itu", "tidak", "adalah", "sebagai", "atau", "oleh", "dalam",
+    },
+    "ja": set(),
     "ka": {
         "და", "უფლება", "აქვს", "ადამიანს", "ყველა", "ყოველ", "ან", "უნდა",
         "არ", "მისი", "თუ", "ამ",
@@ -94,9 +142,20 @@ CUE_WORDS = {
         "жана", "менен", "адам", "бир", "ар", "же", "укуктуу", "тийиш", "бардык",
         "өз", "эмес", "ээ", "эч", "үчүн",
     },
+    "mr": {
+        "आणि", "आहे", "आहेत", "मध्ये", "नाही", "यांच्या", "तसे", "मात्र",
+        "करून", "म्हणून", "होती", "होते",
+    },
     "pa": {
         "تے", "اے", "دا", "دی", "دے", "وچ", "ہر", "شخص", "توں", "یا", "کسے",
         "نوں", "کوئی", "اوہدے", "وی",
+    },
+    "pcm": {
+        "dey", "di", "na", "wey", "dem", "don", "wetin", "sey", "sef", "con",
+    },
+    "pt": {
+        "de", "a", "o", "que", "e", "do", "da", "em", "um", "para", "é",
+        "com", "não", "uma", "os", "no", "se", "na", "por",
     },
     "ps": {
         "د", "په", "او", "چې", "له", "څوک", "شي", "وي", "نه", "هغه", "سره",
@@ -109,6 +168,14 @@ CUE_WORDS = {
     "sd": {
         "جي", "هڪ", "کي", "جو", "کان", "آهي", "لاء", "سان", "تي", "ڪئي",
         "ڪرڻ", "جيڪو", "ڪندي", "ٿي", "هو",
+    },
+    "sw": {
+        "na", "ya", "wa", "kwa", "katika", "ni", "kuwa", "au", "hii", "haki",
+        "kila", "watu", "mtu", "si", "la", "za", "kutoka",
+    },
+    "te": {
+        "మరియు", "యొక్క", "లో", "ఒక", "ఈ", "కు", "నుండి", "కోసం", "అని", "ఉంది",
+        "కాదు", "వారు", "అన్ని", "లేదా",
     },
     "tg": {
         "ва", "дар", "ба", "ки", "ҳар", "як", "ё", "бо", "дорад", "аз",
@@ -149,10 +216,24 @@ CUE_WORDS = {
         "ва", "бир", "инсон", "ёки", "ҳар", "билан", "эгадир", "ўз", "мумкин",
         "барча", "бўлган", "ҳеч", "эмас", "ким", "учун", "бу", "ҳам",
     },
+    "vi": {
+        "và", "của", "là", "có", "trong", "một", "được", "không", "cho", "với",
+        "các", "những", "người", "này", "từ", "đến", "để",
+    },
     "yi": {
         "און", "די", "דער", "אױף", "ניט", "זײ", "איז", "אין", "פֿון", "מיט",
         "צו", "דאָס",
     },
+    "zh": set(),
+}
+CUE_LANGUAGE_COUNTS = Counter(
+    word for language_words in CUE_WORDS.values() for word in language_words
+)
+UNIQUE_CUE_WORDS = {
+    language: {
+        word for word in language_words if CUE_LANGUAGE_COUNTS[word] == 1
+    }
+    for language, language_words in CUE_WORDS.items()
 }
 
 # Weights are deliberately asymmetric: letters confined to one supported
@@ -160,20 +241,33 @@ CUE_WORDS = {
 DISTINCTIVE_CHARACTERS = {
     "ar": {"ة": 2.3} | {character: 0.4 for character in "أإ"} | {"آ": 0.3},
     "az": {character: 3.2 for character in "јҹҝ"} | {"ə": 0.15},
+    "bn": {},
+    "de": {"ß": 3.0},
     "en": {"w": 1.1},
+    "es": {"ñ": 3.0},
     "fa": {"ۀ": 3.0},
+    "fr": {"œ": 3.0},
+    "ha": {character: 3.2 for character in "ɓɗƙ"},
     "he": {},
+    "hi": {},
     "hy": {},
+    "id": {},
+    "ja": {},
     "ka": {},
     "kk": {"ұ": 3.2, "і": 0.5}
     | {character: 0.35 for character in "қғәңөү"},
     "ku": {character: 3.2 for character in "ێڕڵڤêîû"} | {"ۆ": 0.35},
     "ky": {character: 0.35 for character in "ңөү"},
+    "mr": {"ळ": 3.2},
     "pa": {},
+    "pcm": {},
+    "pt": {character: 3.0 for character in "ãõ"},
     "ps": {character: 3.2 for character in "ټځڅډړږښګڼېۍ"}
     | {character: 0.5 for character in "پچژ"},
     "ru": {"щ": 0.5, "ъ": 0.3},
     "sd": {character: 3.2 for character in "ڪٽڊڻٿڏڳڙٻڀڌڇڃٺڄڍ"},
+    "sw": {},
+    "te": {},
     "tg": {character: 3.0 for character in "ӣҷӯ"}
     | {character: 0.7 for character in "ғқҳ"},
     "tk": {character: 3.2 for character in "ýňäž"},
@@ -186,7 +280,9 @@ DISTINCTIVE_CHARACTERS = {
     "uz": {"ў": 6.0, "ʻ": 3.0, "ʼ": 3.0}
     | {character: 0.65 for character in "қғҳ"}
     | {"q": 0.45, "x": 0.35},
+    "vi": {character: 3.2 for character in "ăđơư"},
     "yi": {character: 3.5 for character in "װױײ"},
+    "zh": {},
 }
 
 
@@ -321,15 +417,45 @@ def _script_of(character: str) -> str | None:
         return "Arab"
     if "ARMENIAN" in name:
         return "Armn"
+    if "BENGALI" in name:
+        return "Beng"
     if "CYRILLIC" in name:
         return "Cyrl"
+    if "DEVANAGARI" in name:
+        return "Deva"
     if "GEORGIAN" in name:
         return "Geor"
     if "HEBREW" in name:
         return "Hebr"
+    if "HIRAGANA" in name or "KATAKANA" in name:
+        return "Jpan"
     if "LATIN" in name:
         return "Latn"
+    if "TELUGU" in name:
+        return "Telu"
+    if "CJK UNIFIED IDEOGRAPH" in name or "CJK COMPATIBILITY IDEOGRAPH" in name:
+        return "Hani"
     return None
+
+
+def _script_characters(text: str) -> list[tuple[int, str]]:
+    """Return context-aware script classifications for recognized letters.
+
+    Han ideographs are shared by Chinese and Japanese. If Japanese kana occur
+    in the same text, treat the ideographs as part of the Japanese writing
+    system so they do not overwhelm or fragment the Japanese signal.
+    """
+    classified = [
+        (index, script)
+        for index, character in enumerate(text)
+        if character.isalpha() and (script := _script_of(character)) is not None
+    ]
+    if any(script == "Jpan" for _, script in classified):
+        return [
+            (index, "Jpan" if script == "Hani" else script)
+            for index, script in classified
+        ]
+    return classified
 
 
 def _normalise(text: str) -> str:
@@ -339,7 +465,30 @@ def _normalise(text: str) -> str:
 
 
 def _tokens(text: str) -> list[str]:
-    return WORD_PATTERN.findall(text.translate(APOSTROPHES))
+    translated = text.translate(APOSTROPHES)
+    tokens: list[str] = []
+    current: list[str] = []
+    for index, character in enumerate(translated):
+        is_letter_or_mark = character.isalpha() or unicodedata.category(
+            character
+        ).startswith("M")
+        apostrophe_inside_word = (
+            character == "'"
+            and bool(current)
+            and index + 1 < len(translated)
+            and (
+                translated[index + 1].isalpha()
+                or unicodedata.category(translated[index + 1]).startswith("M")
+            )
+        )
+        if is_letter_or_mark or apostrophe_inside_word:
+            current.append(character)
+        elif current:
+            tokens.append("".join(current))
+            current = []
+    if current:
+        tokens.append("".join(current))
+    return tokens
 
 
 def _ngrams(words: list[str]) -> Counter[str]:
@@ -411,6 +560,8 @@ def _language_is_resolved(
         ) or (cue_score >= 0.9 and top >= 0.70)
     if word_count <= 3:
         return top >= 0.66 and margin >= 0.20
+    if word_count >= 1_000:
+        return top >= 0.20 and margin >= 0.10
     return top >= 0.30 and margin >= 0.05
 
 
@@ -419,11 +570,7 @@ def detect(text: str) -> DetectionResult:
     if not isinstance(text, str):
         raise TypeError("text must be a string")
     normalised = _normalise(text)
-    script_counts = Counter(
-        script
-        for character in normalised
-        if character.isalpha() and (script := _script_of(character)) is not None
-    )
+    script_counts = Counter(script for _, script in _script_characters(normalised))
     if not script_counts:
         return DetectionResult(None, None, 0.0, ())
 
@@ -450,6 +597,7 @@ def detect(text: str) -> DetectionResult:
     raw_scores: dict[str, float] = {}
     distinctive_by_language: dict[str, float] = {}
     cues_by_language: dict[str, float] = {}
+    unique_cues_by_language: dict[str, float] = {}
     for profile in candidates.values():
         language = profile["language_code"]
         distance = _rank_distance(input_ngrams, profile["ngrams"])
@@ -460,14 +608,25 @@ def detect(text: str) -> DetectionResult:
         cue_score = sum(
             min(word_counts[word], 3) for word in CUE_WORDS[language]
         ) / math.sqrt(max(1, len(words)))
+        unique_cue_score = sum(
+            min(word_counts[word], 3) for word in UNIQUE_CUE_WORDS[language]
+        ) / math.sqrt(max(1, len(words)))
         # A language can have multiple profile keys only if future variants are
         # added. Keep its best matching language/script profile.
-        score = -7.0 * distance + 1.25 * distinctive + 0.9 * cue_score
+        score = (
+            -7.0 * distance
+            + 1.25 * distinctive
+            + 0.9 * cue_score
+            + (5.0 * unique_cue_score if len(words) == 1 else 0.0)
+        )
         raw_scores[language] = max(raw_scores.get(language, -math.inf), score)
         distinctive_by_language[language] = max(
             distinctive_by_language.get(language, 0.0), distinctive
         )
         cues_by_language[language] = max(cues_by_language.get(language, 0.0), cue_score)
+        unique_cues_by_language[language] = max(
+            unique_cues_by_language.get(language, 0.0), unique_cue_score
+        )
 
     alternatives = _softmax(raw_scores)
     best = alternatives[0]
@@ -479,6 +638,19 @@ def detect(text: str) -> DetectionResult:
         distinctive_by_language[best.language_code],
         cues_by_language[best.language_code],
     )
+    if not resolved and script == "Latn" and len(words) <= 3:
+        second = alternatives[1].score if len(alternatives) > 1 else 0.0
+        resolved = (
+            unique_cues_by_language[best.language_code] >= 0.50
+            and best.score >= 0.30
+            and best.score - second >= 0.10
+        )
+    direct_evidence = (
+        distinctive_by_language[best.language_code] > 0.0
+        or unique_cues_by_language[best.language_code] > 0.0
+    )
+    if (best.language_code == "pcm" or script == "Deva") and not direct_evidence:
+        resolved = False
     language_code = best.language_code if resolved else None
     confidence = best.score * script_confidence if resolved else script_confidence
     return DetectionResult(
@@ -494,12 +666,7 @@ def _mixed_boundaries(text: str) -> list[int]:
     boundaries.update(match.end() for match in CLAUSE_BOUNDARY_PATTERN.finditer(text))
 
     previous_script: str | None = None
-    for index, character in enumerate(text):
-        if not character.isalpha():
-            continue
-        script = _script_of(character)
-        if script is None:
-            continue
+    for index, script in _script_characters(text):
         if previous_script is not None and script != previous_script:
             boundaries.add(index)
         previous_script = script

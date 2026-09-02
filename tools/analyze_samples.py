@@ -2,16 +2,19 @@
 
 from __future__ import annotations
 
-import re
 import sys
 import unicodedata
 from collections import Counter
 from pathlib import Path
 
+try:
+    from .build_language_profiles import tokens as tokenize
+except ImportError:  # Support ``python tools/analyze_samples.py``.
+    from build_language_profiles import tokens as tokenize
+
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPORA = ROOT / "corpora"
-TOKEN = re.compile(r"[^\W\d_]+(?:[‘’ʼ'][^\W\d_]+)*", re.UNICODE)
 
 
 def script_of(character: str) -> str:
@@ -20,14 +23,24 @@ def script_of(character: str) -> str:
         return "Arabic"
     if "ARMENIAN" in name:
         return "Armenian"
+    if "BENGALI" in name:
+        return "Bengali"
     if "CYRILLIC" in name:
         return "Cyrillic"
+    if "DEVANAGARI" in name:
+        return "Devanagari"
     if "GEORGIAN" in name:
         return "Georgian"
     if "HEBREW" in name:
         return "Hebrew"
+    if "HIRAGANA" in name or "KATAKANA" in name:
+        return "Japanese"
     if "LATIN" in name:
         return "Latin"
+    if "TELUGU" in name:
+        return "Telugu"
+    if "CJK" in name:
+        return "Han"
     return "Other"
 
 
@@ -64,7 +77,7 @@ def main() -> None:
         name: Counter(character for character in text if character.isalpha())
         for name, text in texts.items()
     }
-    tokens = {name: TOKEN.findall(text) for name, text in texts.items()}
+    tokens = {name: tokenize(text) for name, text in texts.items()}
     word_counts = {name: Counter(words) for name, words in tokens.items()}
 
     for name in texts:

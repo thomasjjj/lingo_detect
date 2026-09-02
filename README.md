@@ -9,14 +9,15 @@ the available evidence supports:
 - no resolution when the input has no supported letters.
 
 This avoids forcing a confident-looking language code from inputs such as one
-common letter. The detector is designed primarily for Middle Eastern, Central
-Asian, and adjacent South Caucasian/South Asian languages rather than as a
-universal language classifier.
+common letter. The detector combines broad coverage of high-speaker global
+languages with its original Middle Eastern and Central Asian focus. It remains
+a closed-set classifier rather than a universal language classifier.
 
 ## Features
 
 - Script recognition before language scoring.
-- ISO 639-1 language codes and ISO 15924 script codes.
+- ISO 639-1 language codes where assigned, ISO 639-3 `pcm` for Nigerian
+  Pidgin, and ISO 15924 script codes.
 - Ranked language alternatives for the detected script.
 - Ordered mixed-language and mixed-script spans with exact character offsets.
 - Conservative script-only fallbacks for ambiguous text.
@@ -26,7 +27,8 @@ universal language classifier.
 - Western Persian/Farsi coverage using ISO 639-1 `fa`.
 - Modern Latin-script Turkish coverage using ISO 639-1 `tr`.
 - Regional Arabic varieties and multiscript Turkic/Kurdish coverage.
-- Armenian, Georgian, and Hebrew script recognition.
+- Arabic, Armenian, Bengali, Cyrillic, Devanagari, Georgian, Han, Hebrew,
+  Japanese, Latin, and Telugu writing-system recognition.
 - No runtime dependencies or external services.
 - Packaged language profiles, so detection works offline.
 
@@ -37,25 +39,44 @@ universal language classifier.
 | Arabic | `ar` | Arabic (`Arab`): Modern Standard, Mesopotamian, Ta’izzi-Adeni, South/North Levantine, Najdi, and Egyptian profiles |
 | Armenian | `hy` | Armenian (`Armn`) |
 | Azerbaijani | `az` | North Azerbaijani Latin and Cyrillic; South Azerbaijani Arabic |
+| Bengali | `bn` | Bengali (`Beng`) |
 | English | `en` | Latin (`Latn`) |
+| French | `fr` | Latin (`Latn`) |
+| German | `de` | Latin (`Latn`) |
 | Georgian | `ka` | Georgian (`Geor`) |
+| Hausa | `ha` | Latin (`Latn`) |
 | Hebrew | `he` | Hebrew (`Hebr`) |
+| Hindi | `hi` | Devanagari (`Deva`) |
+| Indonesian | `id` | Latin (`Latn`) |
+| Japanese | `ja` | Japanese (`Jpan`), including kana and Han characters |
 | Kazakh | `kk` | Cyrillic (`Cyrl`) |
 | Kurdish | `ku` | Central Kurdish/Sorani Arabic (`Arab`) and Northern Kurdish/Kurmanji Latin (`Latn`) |
 | Kyrgyz | `ky` | Cyrillic (`Cyrl`) |
+| Mandarin Chinese | `zh` | Han (`Hani`), Simplified Chinese profile |
+| Marathi | `mr` | Devanagari (`Deva`) |
+| Nigerian Pidgin | `pcm` | Latin (`Latn`); ISO 639-3 code because no ISO 639-1 code is assigned |
 | Persian | `fa` | Arabic (`Arab`): Western Persian/Farsi and Dari profiles |
 | Punjabi | `pa` | Western Punjabi/Shahmukhi (`Arab`) |
 | Pashto | `ps` | Arabic (`Arab`), including Northern and Southern evaluation coverage |
+| Portuguese | `pt` | Latin (`Latn`) |
 | Russian | `ru` | Cyrillic (`Cyrl`) |
 | Sindhi | `sd` | Arabic (`Arab`) |
+| Spanish | `es` | Latin (`Latn`) |
+| Swahili | `sw` | Latin (`Latn`) |
 | Tajik | `tg` | Cyrillic (`Cyrl`) |
+| Telugu | `te` | Telugu (`Telu`) |
 | Turkmen | `tk` | Latin (`Latn`) and Cyrillic (`Cyrl`) |
 | Turkish | `tr` | Latin (`Latn`), modern Turkish alphabet |
 | Ukrainian | `uk` | Cyrillic (`Cyrl`) |
 | Urdu | `ur` | Arabic (`Arab`) |
 | Uyghur | `ug` | Uyghur Arabic/UEY (`Arab`), Cyrillic/UKY (`Cyrl`), Latin/ULY (`Latn`), and legacy New Script/UYY (`Latn`) |
 | Uzbek | `uz` | Latin (`Latn`) and Cyrillic (`Cyrl`) |
+| Vietnamese | `vi` | Latin (`Latn`) |
 | Yiddish | `yi` | Hebrew (`Hebr`), included as a Hebrew-script confounder |
+
+The 0.7 global expansion interprets "top" as combined first- and second-language
+speakers. It adds the first 15 previously unsupported entries in the
+[Ethnologue 2026 total-speaker ranking](<https://en.wikipedia.org/wiki/List_of_languages_by_total_number_of_speakers#Ethnologue_(2026)>).
 
 The same language code is returned across orthographies. For example, both
 Latin and Cyrillic Uzbek return `uz`, while all four supported Uyghur
@@ -148,8 +169,8 @@ or raise an error merely because the language is uncertain.
 
 | Field | Type | Meaning |
 |---|---|---|
-| `script` | `str \| None` | Dominant ISO 15924 script: `Arab`, `Armn`, `Cyrl`, `Geor`, `Hebr`, `Latn`, or `None` |
-| `language_code` | `str \| None` | ISO 639-1 language code, or `None` when language evidence is insufficient |
+| `script` | `str \| None` | Dominant ISO 15924 script: `Arab`, `Armn`, `Beng`, `Cyrl`, `Deva`, `Geor`, `Hani`, `Hebr`, `Jpan`, `Latn`, `Telu`, or `None` |
+| `language_code` | `str \| None` | ISO 639-1 code where assigned, ISO 639-3 `pcm` for Nigerian Pidgin, or `None` when language evidence is insufficient |
 | `confidence` | `float` | Confidence in the resolution actually returned |
 | `alternatives` | `tuple[LanguageScore, ...]` | Candidates for the dominant script, ordered from strongest to weakest |
 | `resolution` | `str` | `language`, `script`, or `none` |
@@ -321,9 +342,11 @@ language-specific statistical evidence.
    case-folded. Several typographic apostrophes are treated consistently during
    tokenization.
 2. **Recognize scripts.** Alphabetic characters are classified from their
-   Unicode names as Arabic, Armenian, Cyrillic, Georgian, Hebrew, or Latin. The
-   most frequent script becomes the input's dominant script, and its share of
-   all recognized letters becomes the script confidence.
+   Unicode names as Arabic, Armenian, Bengali, Cyrillic, Devanagari, Georgian,
+   Han, Hebrew, Japanese, Latin, or Telugu. Han characters are grouped with
+   Japanese when kana provide Japanese context. The most frequent writing
+   system becomes the input's dominant script, and its share of all recognized
+   letters becomes the script confidence.
 3. **Restrict the candidate set.** Only language profiles registered for the
    dominant script are considered. This prevents, for example, English from
    competing with Tajik for Cyrillic input.
@@ -365,9 +388,10 @@ several sentences.
 ## Corpora and generated profiles
 
 The exploration corpora live under `corpora/`. Each base sample contains 1,000
-whitespace-delimited tokens from a pinned Universal Declaration of Human Rights
-source, with provenance in the adjacent `sources.json`. Multiple samples are
-included for languages with multiple supported orthographies.
+whitespace-delimited tokens from a pinned Universal Declaration of Human Rights,
+FLORES-200, or NaijaSynCor source, with provenance in adjacent metadata.
+Multiple samples are included for languages with multiple supported
+orthographies.
 
 The detector does not scan corpus files at runtime.
 `tools/build_language_profiles.py` converts them into the ranked character
@@ -380,18 +404,20 @@ Useful corpus commands are:
 python .\tools\analyze_samples.py
 python .\tools\build_samples.py
 python .\tools\build_flores_samples.py
+python .\tools\build_naija_sample.py
 python .\tools\build_language_profiles.py
 ```
 
-`build_samples.py` downloads the pinned UDHR material. Regional varieties not
-present there are built from FLORES-200's `dev` split by
+`build_samples.py` downloads the pinned UDHR material. Regional varieties and
+the added global languages are built from FLORES-200's `dev` split by
 `build_flores_samples.py`; the separate `devtest` split supplies evaluation
-text. Both builders require network access. Rebuilding profiles from existing
-local samples does not.
+text. Nigerian Pidgin uses the NaijaSynCor `train` and `test` splits through
+`build_naija_sample.py` and the evaluation-data builder. Corpus builders require
+network access. Rebuilding profiles from existing local samples does not.
 
 ## Evaluation
 
-The development suite contains 1,448 cases covering every supported language at 1,
+The development suite contains 2,048 cases covering every supported language at 1,
 2, 3, 5, 10, 20, 50, and 100 words. It separately counts exact-language
 answers, correct script-only fallbacks, and wrong answers.
 
@@ -399,12 +425,12 @@ Current results for the bundled detector are:
 
 | Outcome | Cases | Rate |
 |---|---:|---:|
-| Exact language | 991/1,448 | 68.4% |
-| Correct script-only fallback | 457/1,448 | 31.6% |
-| Useful language or script resolution | 1,448/1,448 | 100.0% |
-| Wrong | 0/1,448 | 0.0% |
+| Exact language | 1,369/2,048 | 66.8% |
+| Correct script-only fallback | 679/2,048 | 33.2% |
+| Useful language or script resolution | 2,048/2,048 | 100.0% |
+| Wrong | 0/2,048 | 0.0% |
 
-Across the 20-, 50-, and 100-word buckets, 516/543 cases (95.0%) resolve to the
+Across the 20-, 50-, and 100-word buckets, 704/768 cases (91.7%) resolve to the
 exact language and the remainder safely return the correct script. Short,
 closely related text deliberately accounts for most script-only results.
 
@@ -457,8 +483,8 @@ language identification. When an unsupported language uses a supported script,
 the detector ranks the text only against the registered languages for that
 script. It may return a script-only result, or it may incorrectly resolve the
 text to a supported language when the score passes the normal thresholds. For
-example, French text may sometimes resolve to English, although English is not
-a fixed fallback and another supported Latin-script language may rank first.
+example, unsupported Italian text may sometimes resolve to Spanish, French, or
+another supported Latin-script language; no language is a fixed fallback.
 The ranking reflects profile evidence, not linguistic relatedness.
 
 Use this tool when the caller is reasonably confident that the text being

@@ -2,16 +2,17 @@
 
 Language detection should preserve the highest resolution justified by the
 input. A detector must not force a language code when it only has enough
-evidence for a writing system. Uyghur always uses ISO 639-1 `ug`; its Arabic,
-Cyrillic, and Latin orthographies are represented by the ISO 15924 script code
-in the separate `script` field.
+evidence for a writing system. Language codes use ISO 639-1 where assigned;
+Nigerian Pidgin uses ISO 639-3 `pcm` because it has no ISO 639-1 code. Uyghur
+always uses `ug`; its Arabic, Cyrillic, and Latin orthographies are represented
+by the ISO 15924 script code in the separate `script` field.
 
 The recommended Python result shape is:
 
 ```python
 {
-    "script": "Cyrl",          # Arab, Armn, Cyrl, Geor, Hebr, or Latn
-    "language_code": "tg",    # ISO 639-1 code, or None when uncertain
+    "script": "Cyrl",          # One of the supported ISO 15924 codes
+    "language_code": "tg",    # ISO language code, or None when uncertain
     "confidence": 0.91,
     "alternatives": [
         {"language_code": "tg", "score": 0.91},

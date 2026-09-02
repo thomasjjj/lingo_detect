@@ -57,6 +57,7 @@ Use this section to record confirmed commands as the project matures.
 - Evaluate (uv): `uv run --locked python .\tools\evaluate_detector.py`
 - Generate corpora: `python .\tools\build_samples.py`
 - Generate FLORES corpora: `python .\tools\build_flores_samples.py`
+- Generate Nigerian Pidgin corpus: `python .\tools\build_naija_sample.py`
 - Generate profiles: `python .\tools\build_language_profiles.py`
 - Generate evaluation data: `python .\tools\build_test_samples.py`
 - Build (pip): `python -m build --wheel`

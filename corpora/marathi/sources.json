@@ -1,0 +1,19 @@
+{
+  "language": "marathi",
+  "retrieved_at": "2026-09-02T05:54:21+00:00",
+  "source": "FLORES-200",
+  "split": "dev",
+  "archive_url": "https://dl.fbaipublicfiles.com/nllb/flores200_dataset.tar.gz",
+  "archive_sha256": "b8b0b76783024b85797e5cc75064eb83fc5288b41e9654dabc7be6ae944011f6",
+  "license": "CC BY-SA 4.0",
+  "modified": "Joined dev sentences and truncated to 1,000 whitespace tokens",
+  "samples": [
+    {
+      "sample_file": "sample.txt",
+      "sample_word_count": 1000,
+      "language_code": "mr",
+      "variety": "Marathi",
+      "flores_code": "mar_Deva"
+    }
+  ]
+}

@@ -10,9 +10,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CASES_PATH = ROOT / "tests" / "data" / "flores200_devtest.jsonl"
 LANGUAGES = {
-    "ar", "az", "en", "fa", "he", "hy", "ka", "kk", "ku", "ky",
-    "pa", "ps", "ru", "sd", "tg", "tk", "tr", "ug", "uk", "ur",
-    "uz", "yi",
+    "ar", "az", "bn", "de", "en", "es", "fa", "fr", "ha", "he",
+    "hi", "hy", "id", "ja", "ka", "kk", "ku", "ky", "mr", "pa",
+    "pcm", "ps", "pt", "ru", "sd", "sw", "te", "tg", "tk", "tr",
+    "ug", "uk", "ur", "uz", "vi", "yi", "zh",
 }
 LENGTHS = {1, 2, 3, 5, 10, 20, 50, 100}
 CASES_PER_BUCKET = 5
@@ -158,7 +159,22 @@ class EvaluationDataTests(unittest.TestCase):
                     self.assertLess(previous[1], current[0])
 
     def test_new_script_cases_use_the_declared_unicode_script(self) -> None:
-        script_names = {"Armn": "ARMENIAN", "Geor": "GEORGIAN", "Hebr": "HEBREW"}
+        script_names = {
+            "Armn": "ARMENIAN",
+            "Beng": "BENGALI",
+            "Deva": "DEVANAGARI",
+            "Geor": "GEORGIAN",
+            "Hebr": "HEBREW",
+            "Telu": "TELUGU",
+        }
+        minimum_shares = {
+            "Armn": 0.90,
+            "Beng": 0.70,
+            "Deva": 0.70,
+            "Geor": 0.90,
+            "Hebr": 0.90,
+            "Telu": 0.70,
+        }
         for case in self.cases:
             if case["script"] not in script_names:
                 continue
@@ -169,7 +185,31 @@ class EvaluationDataTests(unittest.TestCase):
                     for character in letters
                     if script_names[case["script"]] in unicodedata.name(character, "")
                 ]
-                self.assertGreater(len(matching) / len(letters), 0.90)
+                self.assertGreaterEqual(
+                    len(matching) / len(letters), minimum_shares[case["script"]]
+                )
+
+    def test_east_asian_cases_use_the_declared_writing_system(self) -> None:
+        for case in self.cases:
+            if case["script"] not in {"Hani", "Jpan"}:
+                continue
+            with self.subTest(case=case["id"]):
+                names = [
+                    unicodedata.name(character, "")
+                    for character in case["text"]
+                    if character.isalpha()
+                ]
+                if case["script"] == "Hani":
+                    matching = [name for name in names if "CJK" in name]
+                else:
+                    matching = [
+                        name
+                        for name in names
+                        if "CJK" in name
+                        or "HIRAGANA" in name
+                        or "KATAKANA" in name
+                    ]
+                self.assertGreaterEqual(len(matching) / len(names), 0.70)
 
     def test_ids_and_texts_are_unique(self) -> None:
         ids = [case["id"] for case in self.cases]
@@ -197,10 +237,13 @@ class EvaluationDataTests(unittest.TestCase):
                 self.assertNotIn("\ufffd", case["text"])
                 self.assertTrue(any(character.isalpha() for character in case["text"]))
                 self.assertIn(
-                    case["source"]["dataset"], {"FLORES-200", "Tatoeba", "UDHR"}
+                    case["source"]["dataset"],
+                    {"FLORES-200", "NaijaSynCor", "Tatoeba", "UDHR"},
                 )
                 if case["source"]["dataset"] == "FLORES-200":
                     self.assertEqual(case["source"]["split"], "devtest")
+                elif case["source"]["dataset"] == "NaijaSynCor":
+                    self.assertEqual(case["source"]["split"], "test")
                 elif case["source"]["dataset"] == "UDHR":
                     self.assertEqual(
                         case["source"]["split"], "heldout_after_training_prefix"
